@@ -10,6 +10,7 @@ class AddressPool
     //--Scope
     private IPAddress startIPAddress;
     private IPAddress endIPAddress;
+    private IPAddress lastIPAddress;
     private int availableAddresses;
 
     //--Leased Addresses
@@ -28,6 +29,41 @@ class AddressPool
 
     public IPAddress getFreeIPAddress()
     {
+        if(lastIPAddress == null)
+        {
+            lastIPAddress = startIPAddress;
+        }
+
+        byte[] lastIPBytes = lastIPAddress.GetAddressBytes();
+
+        lastIPBytes[3]++;
+
+
+        if (lastIPBytes[3] == 254)
+        {
+            lastIPBytes[2] += 1;
+            lastIPBytes[3] = 1;
+        }
+
+        if (lastIPBytes[2] == 254)
+        {
+            lastIPBytes[1] += 1;
+            lastIPBytes[2] = 1;
+        }
+
+        if (lastIPBytes[1] == 254)
+        {
+            lastIPBytes[0] += 1;
+            lastIPBytes[1] = 1;
+        }
+
+        lastIPAddress = IPAddress.Parse(lastIPBytes[0] + "." + lastIPBytes[1] + "." + lastIPBytes[2] + "." + lastIPBytes[3]);
+
+        if (!endIPAddress.Equals(lastIPAddress))
+        {
+            return lastIPAddress;
+        }
+
         return null;
     }
 

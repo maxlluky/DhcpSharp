@@ -23,6 +23,7 @@ namespace Dhcp_Server
             initializeLocalhost();
 
             addresspool.setAddressScope(IPAddress.Parse("172.16.0.100"), IPAddress.Parse("172.16.0.200"));
+            Console.WriteLine("New Free Address: " + addresspool.getFreeIPAddress());
 
             //--Wait for Dhcp Discovery messages
             listen();
