@@ -1,75 +1,27 @@
 ﻿using PcapDotNet.Core;
-using PcapDotNet.Packets;
-using PcapDotNet.Packets.Ethernet;
-using PcapDotNet.Packets.IpV4;
-using PcapDotNet.Packets.Transport;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dhcp_Server
 {
     class Program
     {
+        //--Classes
         private static Localhost localhost = new Localhost();
         private static AddressPool addresspool = new AddressPool();
+        private static Interface inter = new Interface(localhost);
+        private static Service service = new Service(localhost, addresspool, inter);
 
         static void Main(string[] args)
         {
             //--Get and set the local interface to use
             initializeLocalhost();
 
-            addresspool.setAddressScope(IPAddress.Parse("172.16.0.100"), IPAddress.Parse("172.16.0.200"));
-            Console.WriteLine("New Free Address: " + addresspool.getFreeIPAddress());
-
             //--Wait for Dhcp Discovery messages
-            listen();
+            service.startListen();
 
             Console.Read();
-        }
-
-        private static void listen()
-        {
-            //--Get active Interface/Device to use
-            PacketDevice packetDevice = localhost.getActiveInterface();
-            // Open the device
-            using (PacketCommunicator communicator = packetDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))                                 
-            {
-                Console.WriteLine("Listening on " + packetDevice.Description + "...");
-
-                //--Set a filter to reduce the traffic
-                communicator.SetFilter("udp");
-
-                // start the capture
-                communicator.ReceivePackets(0, receiveCallback);
-            }
-        }
-
-        // Callback function invoked by Pcap.Net for every incoming packet
-        private static void receiveCallback(Packet packet)
-        {
-            //--Parsing the layer above Ethernet
-            IpV4Datagram ipPacket = packet.Ethernet.IpV4;
-            UdpDatagram udpDatagram = ipPacket.Udp;
-
-            //--Writes out Packet-Information
-            Console.WriteLine(packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss.fff") + " length:" + packet.Length + "\t" + ipPacket.Source + ":" + udpDatagram.SourcePort + "\t" + ipPacket.Destination + ":" + udpDatagram.DestinationPort);
-
-            //--Check if Packet is DHCP-Discover (= 300 Bytes)
-            if (ipPacket.Source.ToString() == "0.0.0.0" & ipPacket.Destination.ToString() == "255.255.255.255" & udpDatagram.DestinationPort == (ushort)67 & udpDatagram.Payload.Length == 300)
-            {
-                //--Temp. send offer to client
-                sendDhcpOffer(packet.Ethernet.Source);
-            }
-        }
-
-        private static void sendDhcpOffer(MacAddress pSourceMacAddress)
-        {
-
-        }
+        }        
 
         private static void initializeLocalhost()
         {
@@ -96,12 +48,15 @@ namespace Dhcp_Server
                 printInterfaceInfo(localhost.getUseableInterfaces()[i]);
             }
 
-            // Set the interface 
+            // Set the interface by Interface-Index
             Console.Write("Enter the interface number to select: ");
-            localhost.setActiveInterface(Convert.ToInt32(Console.ReadLine()));
+            int interfaceIndex = Convert.ToInt32(Console.ReadLine());
+
+            inter.setInterfaceIndex(interfaceIndex);
+            localhost.setActiveInterface(interfaceIndex);
 
             //--Define Addresspool
-
+            addresspool.setAddressScope(IPAddress.Parse("172.16.0.1"), IPAddress.Parse("172.16.0.255"));
         }
 
         private static void printInterfaceInfo(IPacketDevice pDevice)
