@@ -21,7 +21,7 @@ namespace Dhcp_Server
             service.startListen();
 
             Console.Read();
-        }        
+        }
 
         private static void initializeLocalhost()
         {

@@ -22,5 +22,5 @@ class Localhost
     public void setActiveInterface(int pNr)
     {
         packetDevice = allDevices[pNr];
-    }    
+    }
 }

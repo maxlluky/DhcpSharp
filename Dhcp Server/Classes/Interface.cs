@@ -1,5 +1,4 @@
 ﻿using PcapDotNet.Core;
-using System;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -77,6 +76,6 @@ class Interface
             interfaceBroadcast = IPAddress.Parse(deviceAddress.Broadcast.ToString().Replace("Internet ", ""));
         }
 
-        return interfaceBroadcast;        
+        return interfaceBroadcast;
     }
 }

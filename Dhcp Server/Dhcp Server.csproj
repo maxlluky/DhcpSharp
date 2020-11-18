@@ -37,8 +37,8 @@
     <StartupObject>Dhcp_Server.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DhcpDotNet, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DhcpDotNet.1.0.9\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
+    <Reference Include="DhcpDotNet, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DhcpDotNet.2.0.0\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
     </Reference>
     <Reference Include="PcapDotNet.Base, Version=1.0.4.25027, Culture=neutral, PublicKeyToken=06a20bc2fabb1931, processorArchitecture=MSIL">
       <HintPath>..\packages\Pcap.Net.x64.1.0.4.1\lib\net45\PcapDotNet.Base.dll</HintPath>
