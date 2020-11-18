@@ -56,7 +56,7 @@ namespace Dhcp_Server
             localhost.setActiveInterface(interfaceIndex);
 
             //--Define Addresspool
-            addresspool.setAddressScope(IPAddress.Parse("172.16.0.1"), IPAddress.Parse("172.16.0.255"));
+            addresspool.setAddressScope(IPAddress.Parse("172.16.0.1"), IPAddress.Parse("172.16.5.255"));
         }
 
         private static void printInterfaceInfo(IPacketDevice pDevice)

@@ -1,5 +1,4 @@
 ﻿using PcapDotNet.Core;
-using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -36,7 +35,7 @@ class Interface
         NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
         //--Get active PacketDevice
-        PacketDevice device = localhost.getActiveInterface();        
+        PacketDevice device = localhost.getActiveInterface();
 
         //--Create Empty sting for HwAddress
         string hwAddress = null;
