@@ -1,4 +1,5 @@
 ﻿using PcapDotNet.Core;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -26,20 +27,33 @@ class Interface
     }
 
     /// <summary>
-    /// Returns the Hw-Address of a local Networkinterface
+    /// Returns the Hw-Address of the active local Networkinterface used by the dhcp server
     /// </summary>
     /// <returns></returns>
     public string getHwAddress()
     {
+        //--Get all Networkinterfaces
         NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-        string rawHwAddress = networkInterfaces[interfaceIndex].GetPhysicalAddress().ToString();
 
-        for (int i = 2; i <= 16; i += 3)
+        //--Get active PacketDevice
+        PacketDevice device = localhost.getActiveInterface();        
+
+        //--Create Empty sting for HwAddress
+        string hwAddress = null;
+
+        foreach (NetworkInterface item in networkInterfaces)
         {
-            rawHwAddress = rawHwAddress.Insert(i, ":");
+            if (item.Id == device.Name.Split('_')[1])
+            {
+                hwAddress = item.GetPhysicalAddress().ToString();
+
+                for (int i = 2; i <= 16; i += 3)
+                {
+                    hwAddress = hwAddress.Insert(i, ":");
+                }
+            }
         }
 
-        string hwAddress = rawHwAddress;
         return hwAddress;
     }
 
