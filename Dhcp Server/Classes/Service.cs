@@ -6,10 +6,10 @@ using PcapDotNet.Packets.Ethernet;
 using PcapDotNet.Packets.IpV4;
 using PcapDotNet.Packets.Transport;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
 
 class Service
 {
@@ -35,6 +35,8 @@ class Service
         using (PacketCommunicator communicator = packetDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
         {
             Console.WriteLine("Listening on " + packetDevice.Description + "...");
+            Console.WriteLine("Status\t\t\tDestination MAC\t\tDHCP Message\tTransaction ID");
+            Console.WriteLine("===================================================================================");
 
             //--Set a filter to reduce the traffic
             communicator.SetFilter("udp");
@@ -53,48 +55,100 @@ class Service
 
         Datagram datagram = udpDatagram.Payload;
 
-        //--Create a new DhcpPacket to parse the received and read Data from it.
-        DhcpPacket receivedDhcp = new DhcpPacket();
-        receivedDhcp.parsePacket(datagram.ToArray());
-
-        //--Check if Packet is DHCP-Discover.
-        if (ipPacket.Source.Equals(new IpV4Address("0.0.0.0")) & ipPacket.Destination.Equals(new IpV4Address("255.255.255.255")) & udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
+        //--Check if Packet is DHCP with Ports.
+        if (udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
         {
-            //--Sending an Dhcp Offer 
-            sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.transactionID);
-        }
+            //--Create a new DhcpPacket to parse the received and read Data from it.
+            DhcpPacket receivedDhcp = new DhcpPacket();
+            receivedDhcp.parsePacket(datagram.ToArray());
 
-        Thread.Sleep(500);
+            //--Create a dhcpOption.             
+            List<DhcpOption> list = new DhcpOption().parseDhcpOptions(receivedDhcp.dhcpOptions);
 
-        //--Check if Packet is DHCP-Request.
-        if (ipPacket.Source.Equals(new IpV4Address("0.0.0.0")) & ipPacket.Destination.Equals(new IpV4Address("255.255.255.255")) & udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
-        {
-            //--Sending Dhcp Ack  
-            sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.transactionID);
+            foreach (DhcpOption item in list)
+            {
+                if (item.optionIdBytes.Equals(0x35))
+                {
+                    switch (item.optionValue[0])
+                    {
+                        case 0x01:
+                            Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(receivedDhcp.xid));
+
+                            //--Sending an Dhcp Offer                             
+                            sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.xid, receivedDhcp.secs);
+
+                            break;
+                        case 0x03:
+                            Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(receivedDhcp.xid));
+
+                            foreach (DhcpOption item2 in list)
+                            {
+                                if (item2.optionIdBytes.Equals(0x36))
+                                {
+                                    if (BitConverter.ToInt32(item2.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
+                                    {
+                                        //--Sending Dhcp Ack  
+                                        sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.xid, receivedDhcp.secs);
+                                    }
+                                    else
+                                    {
+                                        //--Destination prefers other DHCP
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 
-    private Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId)
+    public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
+    {
+        Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tOFFER\t\txid: " + BitConverter.ToString(pTransactionId));
+        PacketDevice packetDevice = localhost.getActiveInterface();
+
+        //--Open the output device
+        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
+        {
+            //--Send down the packet
+            communicator.SendPacket(buildDhcpOffer(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
+        }
+    }
+
+    public void sendDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
+    {
+        Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tACK\t\txid: " + BitConverter.ToString(pTransactionId));
+        PacketDevice packetDevice = localhost.getActiveInterface();
+
+        //--Open the output device
+        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
+        {
+            //--Send down the packet
+            communicator.SendPacket(buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
+        }
+    }
+
+    private Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
         //--Get a new IP from the Pool
         newClientIPAddress = addressPool.getFreeIPAddress();
 
         //--Get local IP and Subnet
         IPAddress ipaddress = inter.getIPAddress();
-        IPAddress subnetmask = inter.getNetmask();
 
         //--Create the DHCP Option
         DhcpOption dhcpMessageTypeOption = new DhcpOption
         {
             optionId = dhcpOptionIds.DhcpMessageType,
-            optionLength = new byte[] { 0x01 },
+            optionLength = 0x01,
             optionValue = new byte[] { 0x02 },
         };
 
         DhcpOption dhcpServerIdentifierOption = new DhcpOption
         {
             optionId = dhcpOptionIds.ServerIdentifier,
-            optionLength = new byte[] { 0x04 },
+            optionLength =  0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
       
@@ -102,12 +156,13 @@ class Service
         //--DHCP Payload
         DhcpPacket dhcpPacket = new DhcpPacket
         {
-            messageType = new byte[] { 0x02 },
-            transactionID = pTransactionId,
-            clientIP = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-            yourIP = newClientIPAddress.GetAddressBytes(),
-            nextServerIP = ipaddress.GetAddressBytes(),
-            clientMac = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
+            op = new byte[] { 0x02 },
+            xid = pTransactionId,
+            secs = pSecs,
+            ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
+            yiaddr = newClientIPAddress.GetAddressBytes(),
+            siaddr = ipaddress.GetAddressBytes(),
+            chaddr = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
         };
 
@@ -143,7 +198,7 @@ class Service
         return builder.Build(DateTime.Now);
     }
 
-    private Packet buildDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId)
+    private Packet buildDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
         //--Get a new IP from the Pool
         IPAddress ipaddress = inter.getIPAddress();
@@ -153,35 +208,35 @@ class Service
         DhcpOption dhcpMessageTypeOption = new DhcpOption
         {
             optionId = dhcpOptionIds.DhcpMessageType,
-            optionLength = new byte[] { 0x01 },
+            optionLength = 0x01,
             optionValue = new byte[] { 0x05 },
         };
 
         DhcpOption dhcpServerIdentifierOption = new DhcpOption
         {
             optionId = dhcpOptionIds.ServerIdentifier,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
 
         DhcpOption ipAddressLeaseTimeOption = new DhcpOption
         {
             optionId = dhcpOptionIds.IpAddressLeaseTime,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x0d, 0x2f, 0x00 },
         };
 
         DhcpOption renewalTimeValueOption = new DhcpOption
         {
             optionId = dhcpOptionIds.RenewalTimeValue,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x06, 0x97, 0x80 },
         };
 
         DhcpOption rebindTimeValueOption = new DhcpOption
         {
             optionId = dhcpOptionIds.RebindingTimeValue,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x0b, 0x89, 0x20 },
         };
 
@@ -189,28 +244,28 @@ class Service
         DhcpOption subnetMaskOption = new DhcpOption
         {
             optionId = dhcpOptionIds.Subnetmask,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = subnetmask.GetAddressBytes(),
         };
 
         DhcpOption routerOption = new DhcpOption
         {
             optionId = dhcpOptionIds.Router,
-            optionLength = new byte[] { 0x04 },
-            optionValue = ipaddress.GetAddressBytes(),
+            optionLength = 0x04,
+            optionValue = addressPool.getGatewayIpAddress().GetAddressBytes(),
         };
 
         DhcpOption domainNameServerOption = new DhcpOption
         {
             optionId = dhcpOptionIds.DomainNameServer,
-            optionLength = new byte[] { 0x04 },
+            optionLength = 0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
 
         DhcpOption domainNameOption = new DhcpOption
         {
             optionId = dhcpOptionIds.DomainName,
-            optionLength = new byte[] { 0x09 },
+            optionLength = 0x09,
             optionValue = new byte[] { 0x66, 0x72, 0x69, 0x74, 0x7a, 0x2e, 0x62, 0x6f, 0x78 },
         };
 
@@ -218,12 +273,13 @@ class Service
         //--DHCP Payload
         DhcpPacket dhcpPacket = new DhcpPacket
         {
-            messageType = new byte[] { 0x02 },
-            transactionID = pTransactionId,
-            clientIP = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-            yourIP = newClientIPAddress.GetAddressBytes(),
-            nextServerIP = ipaddress.GetAddressBytes(),
-            clientMac = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
+            op = new byte[] { 0x02 },
+            xid = pTransactionId,
+            secs = pSecs,
+            ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
+            yiaddr = newClientIPAddress.GetAddressBytes(),
+            siaddr = ipaddress.GetAddressBytes(),
+            chaddr = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).Concat(ipAddressLeaseTimeOption.buildDhcpOption()).Concat(renewalTimeValueOption.buildDhcpOption()).Concat(rebindTimeValueOption.buildDhcpOption()).Concat(subnetMaskOption.buildDhcpOption()).Concat(routerOption.buildDhcpOption()).Concat(domainNameServerOption.buildDhcpOption()).Concat(domainNameOption.buildDhcpOption()).ToArray(),
         };
 
@@ -257,33 +313,5 @@ class Service
 
         //--Build the packet
         return builder.Build(DateTime.Now);
-    }
-
-    public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId)
-    {
-        Console.WriteLine("Sending DHCP-Offer \t from:\t " + pSourceMacAddress + "\t to:\t" + pDestinationMacAddress);
-
-        PacketDevice packetDevice = localhost.getActiveInterface();
-
-        //--Open the output device
-        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
-        {
-            //--Send down the packet
-            communicator.SendPacket(buildDhcpOffer(pSourceMacAddress, pDestinationMacAddress, pTransactionId));
-        }
-    }
-
-    public void sendDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId)
-    {
-        Console.WriteLine("Sending DHCP-ACK \t from:\t " + pSourceMacAddress + "\t to:\t" + pDestinationMacAddress);
-
-        PacketDevice packetDevice = localhost.getActiveInterface();
-
-        //--Open the output device
-        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
-        {
-            //--Send down the packet
-            communicator.SendPacket(buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId));
-        }
-    }
+    }   
 }

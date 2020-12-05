@@ -17,6 +17,9 @@ namespace Dhcp_Server
             //--Get and set the local interface to use
             initializeLocalhost();
 
+            //--Clear Console with basic configuration
+            Console.Clear();
+
             //--Wait for Dhcp Discovery messages
             service.startListen();
 
@@ -48,15 +51,24 @@ namespace Dhcp_Server
                 printInterfaceInfo(localhost.getUseableInterfaces()[i]);
             }
 
-            // Set the interface by Interface-Index
+            //--Set the interface by Interface-Index
             Console.Write("Enter the interface number to select: ");
             int interfaceIndex = Convert.ToInt32(Console.ReadLine());
 
             inter.setInterfaceIndex(interfaceIndex);
             localhost.setActiveInterface(interfaceIndex);
 
-            //--Define Addresspool
-            addresspool.setAddressScope(IPAddress.Parse("172.16.0.1"), IPAddress.Parse("172.16.5.255"));
+            //--Define the Gateway
+            Console.Write("Please set the Gateway-IPv4: ");
+            addresspool.setGatewayIpAddress(IPAddress.Parse(Console.ReadLine()));
+
+            //--Define the Addresspool
+            Console.Write("Please set start-IPv4: ");
+            string start = Console.ReadLine();
+            Console.Write("Please set end-IPv4: ");
+            string end = Console.ReadLine();
+
+            addresspool.setAddressScope(IPAddress.Parse(start), IPAddress.Parse(end));
         }
 
         private static void printInterfaceInfo(IPacketDevice pDevice)

@@ -4,6 +4,9 @@ using System.Net;
 
 class AddressPool
 {
+    //--Gateway 
+    private IPAddress gatewyIpAddress;
+
     //--Scope
     private IPAddress startIPAddress;
     private IPAddress lastIPAddress;
@@ -11,6 +14,16 @@ class AddressPool
 
     //--Leased Addresses
     List<IPAddress> leasedIPAddresses = new List<IPAddress>();
+
+    public IPAddress getGatewayIpAddress()
+    {
+        return gatewyIpAddress;
+    }
+
+    public void setGatewayIpAddress(IPAddress pGatewayIpAddress)
+    {
+        gatewyIpAddress = pGatewayIpAddress;
+    }
 
     /// <summary>
     /// Returns the current number of available addresses
