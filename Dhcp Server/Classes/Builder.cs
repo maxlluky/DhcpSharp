@@ -21,7 +21,7 @@ class Builder
     {
         addressPool = pAddressPool;
         inter = pInterface;
-    }    
+    }
 
     public Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {

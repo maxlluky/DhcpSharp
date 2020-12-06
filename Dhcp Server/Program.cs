@@ -2,7 +2,7 @@
 using System;
 using System.Net;
 
-namespace Dhcp_Server
+namespace DhcpSharp
 {
     class Program
     {
