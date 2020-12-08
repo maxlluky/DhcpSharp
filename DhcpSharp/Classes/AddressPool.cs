@@ -10,7 +10,7 @@ class AddressPool
     //--Scope
     private IPAddress startIPAddress;
     private IPAddress lastIPAddress;
-    private int availableAddresses;
+    private long freeAddressesCount;
 
     //--Leased Addresses
     List<IPAddress> leasedIPAddresses = new List<IPAddress>();
@@ -26,15 +26,6 @@ class AddressPool
     }
 
     /// <summary>
-    /// Returns the current number of available addresses
-    /// </summary>
-    /// <returns></returns>
-    public int getFreeAddressCount()
-    {
-        return availableAddresses;
-    }
-
-    /// <summary>
     /// Defines a new address pool. The start and end address is specified. IP addresses can later be claimed from this range.
     /// </summary>
     /// <param name="pStartIPAddress">Start IP address e.g. 192.168.178.100</param>
@@ -43,8 +34,7 @@ class AddressPool
     {
         startIPAddress = pStartIPAddress;
 
-        //--Calculate availableAddresses
-        availableAddresses = Convert.ToInt32(pEndIPAddress.ToString().Replace(".", string.Empty)) - Convert.ToInt32(pStartIPAddress.ToString().Replace(".", string.Empty));
+        freeAddressesCount = Convert.ToInt64(pEndIPAddress.ToString().Replace(".", string.Empty)) - Convert.ToInt64(pStartIPAddress.ToString().Replace(".", string.Empty));
     }
 
     /// <summary>
@@ -53,9 +43,9 @@ class AddressPool
     /// <returns></returns>
     public IPAddress getFreeIPAddress()
     {
-        if (leasedIPAddresses.Count != availableAddresses)
+        if (true)
         {
-            if (lastIPAddress == null)
+            if (leasedIPAddresses.Count != freeAddressesCount)
             {
                 lastIPAddress = startIPAddress;
             }

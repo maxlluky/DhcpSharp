@@ -40,8 +40,8 @@
     <ApplicationIcon>distributed.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DhcpDotNet, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DhcpDotNet.2.0.1\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
+    <Reference Include="DhcpDotNet, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DhcpDotNet.2.0.3\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
     </Reference>
     <Reference Include="PcapDotNet.Base, Version=1.0.4.25027, Culture=neutral, PublicKeyToken=06a20bc2fabb1931, processorArchitecture=MSIL">
       <HintPath>..\packages\Pcap.Net.x64.1.0.4.1\lib\net45\PcapDotNet.Base.dll</HintPath>

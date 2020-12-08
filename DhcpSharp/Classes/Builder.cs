@@ -32,25 +32,25 @@ class Builder
         IPAddress ipaddress = inter.getIPAddress();
 
         //--Create the DHCP Option
-        DhcpOption dhcpMessageTypeOption = new DhcpOption
+        DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.DhcpMessageType,
+            optionId = DHCPv4OptionIds.DhcpMessageType,
             optionLength = 0x01,
             optionValue = new byte[] { 0x02 },
         };
 
-        DhcpOption dhcpServerIdentifierOption = new DhcpOption
+        DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.ServerIdentifier,
+            optionId = DHCPv4OptionIds.ServerIdentifier,
             optionLength = 0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
 
 
         //--DHCP Payload
-        DhcpPacket dhcpPacket = new DhcpPacket
+        DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
-            op = new byte[] { 0x02 },
+            op = 0x02,
             xid = pTransactionId,
             secs = pSecs,
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
@@ -99,75 +99,75 @@ class Builder
         IPAddress subnetmask = inter.getNetmask();
 
         //--Create the DHCP Option
-        DhcpOption dhcpMessageTypeOption = new DhcpOption
+        DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.DhcpMessageType,
+            optionId = DHCPv4OptionIds.DhcpMessageType,
             optionLength = 0x01,
             optionValue = new byte[] { 0x05 },
         };
 
-        DhcpOption dhcpServerIdentifierOption = new DhcpOption
+        DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.ServerIdentifier,
+            optionId = DHCPv4OptionIds.ServerIdentifier,
             optionLength = 0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
 
-        DhcpOption ipAddressLeaseTimeOption = new DhcpOption
+        DHCPv4Option ipAddressLeaseTimeOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.IpAddressLeaseTime,
+            optionId = DHCPv4OptionIds.IpAddressLeaseTime,
             optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x0d, 0x2f, 0x00 },
         };
 
-        DhcpOption renewalTimeValueOption = new DhcpOption
+        DHCPv4Option renewalTimeValueOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.RenewalTimeValue,
+            optionId = DHCPv4OptionIds.RenewalTimeValue,
             optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x06, 0x97, 0x80 },
         };
 
-        DhcpOption rebindTimeValueOption = new DhcpOption
+        DHCPv4Option rebindTimeValueOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.RebindingTimeValue,
+            optionId = DHCPv4OptionIds.RebindingTimeValue,
             optionLength = 0x04,
             optionValue = new byte[] { 0x00, 0x0b, 0x89, 0x20 },
         };
 
 
-        DhcpOption subnetMaskOption = new DhcpOption
+        DHCPv4Option subnetMaskOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.Subnetmask,
+            optionId = DHCPv4OptionIds.Subnetmask,
             optionLength = 0x04,
             optionValue = subnetmask.GetAddressBytes(),
         };
 
-        DhcpOption routerOption = new DhcpOption
+        DHCPv4Option routerOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.Router,
+            optionId = DHCPv4OptionIds.Router,
             optionLength = 0x04,
             optionValue = addressPool.getGatewayIpAddress().GetAddressBytes(),
         };
 
-        DhcpOption domainNameServerOption = new DhcpOption
+        DHCPv4Option domainNameServerOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.DomainNameServer,
+            optionId = DHCPv4OptionIds.DomainNameServer,
             optionLength = 0x04,
             optionValue = ipaddress.GetAddressBytes(),
         };
 
-        DhcpOption domainNameOption = new DhcpOption
+        DHCPv4Option domainNameOption = new DHCPv4Option
         {
-            optionId = dhcpOptionIds.DomainName,
+            optionId = DHCPv4OptionIds.DomainName,
             optionLength = 0x09,
             optionValue = new byte[] { 0x66, 0x72, 0x69, 0x74, 0x7a, 0x2e, 0x62, 0x6f, 0x78 },
         };
 
 
         //--DHCP Payload
-        DhcpPacket dhcpPacket = new DhcpPacket
+        DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
-            op = new byte[] { 0x02 },
+            op = 0x02,
             xid = pTransactionId,
             secs = pSecs,
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },

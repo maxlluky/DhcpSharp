@@ -58,13 +58,13 @@ class Service
         if (udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
         {
             //--Create a new DhcpPacket to parse the received and read Data from it.
-            DhcpPacket receivedDhcp = new DhcpPacket();
+            DHCPv4Packet receivedDhcp = new DHCPv4Packet();
             receivedDhcp.parsePacket(datagram.ToArray());
 
             //--Create a dhcpOption.             
-            List<DhcpOption> list = new DhcpOption().parseDhcpOptions(receivedDhcp.dhcpOptions);
+            List<DHCPv4Option> list = new DHCPv4Option().parseDhcpOptions(receivedDhcp.dhcpOptions);
 
-            foreach (DhcpOption item in list)
+            foreach (DHCPv4Option item in list)
             {
                 if (item.optionIdBytes.Equals(0x35))
                 {
@@ -80,7 +80,7 @@ class Service
                         case 0x03:
                             Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(receivedDhcp.xid));
 
-                            foreach (DhcpOption item2 in list)
+                            foreach (DHCPv4Option item2 in list)
                             {
                                 if (item2.optionIdBytes.Equals(0x36))
                                 {
