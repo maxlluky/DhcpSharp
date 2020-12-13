@@ -46,11 +46,12 @@ class Builder
             optionValue = ipaddress.GetAddressBytes(),
         };
 
-
         //--DHCP Payload
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
             op = 0x02,
+            htype = 0x01,
+            hlen = 0x06,
             xid = pTransactionId,
             secs = pSecs,
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
@@ -168,6 +169,8 @@ class Builder
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
             op = 0x02,
+            htype = 0x01,
+            hlen = 0x06,
             xid = pTransactionId,
             secs = pSecs,
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },

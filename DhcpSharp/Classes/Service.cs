@@ -48,58 +48,74 @@ class Service
     // Callback function invoked by Pcap.Net for every incoming packet
     private void receiveCallback(Packet packet)
     {
-        //--Parsing the layer above Ethernet
-        IpV4Datagram ipPacket = packet.Ethernet.IpV4;
-        UdpDatagram udpDatagram = ipPacket.Udp;
-
-        Datagram datagram = udpDatagram.Payload;
-
-        //--Check if Packet is DHCP with Ports.
-        if (udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
+        try
         {
-            //--Create a new DhcpPacket to parse the received and read Data from it.
-            DHCPv4Packet receivedDhcp = new DHCPv4Packet();
-            receivedDhcp.parsePacket(datagram.ToArray());
+            //--Parsing the layer above Ethernet
+            IpV4Datagram ipPacket = packet.Ethernet.IpV4;
+            UdpDatagram udpDatagram = ipPacket.Udp;
 
-            //--Create a dhcpOption.             
-            List<DHCPv4Option> list = new DHCPv4Option().parseDhcpOptions(receivedDhcp.dhcpOptions);
+            Datagram datagram = udpDatagram.Payload;
 
-            foreach (DHCPv4Option item in list)
+            //--Check if Packet is DHCP with Ports.
+            if (udpDatagram.SourcePort.Equals(68) & udpDatagram.DestinationPort.Equals(67))
             {
-                if (item.optionIdBytes.Equals(0x35))
+                //--Create a new DhcpPacket to parse the received and read Data from it.
+                DHCPv4Packet dhcpv4Packet = new DHCPv4Packet();
+
+                if (dhcpv4Packet.parsePacket(datagram.ToArray()))
                 {
-                    switch (item.optionValue[0])
+                    //--Create a dhcpOption.             
+                    List<DHCPv4Option> list = new DHCPv4Option().parseDhcpOptions(dhcpv4Packet.dhcpOptions);
+
+                    foreach (DHCPv4Option item in list)
                     {
-                        case 0x01:
-                            Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(receivedDhcp.xid));
-
-                            //--Sending an Dhcp Offer                             
-                            sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.xid, receivedDhcp.secs);
-
-                            break;
-                        case 0x03:
-                            Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(receivedDhcp.xid));
-
-                            foreach (DHCPv4Option item2 in list)
+                        if (item.optionIdBytes.Equals(0x35))
+                        {
+                            switch (item.optionValue[0])
                             {
-                                if (item2.optionIdBytes.Equals(0x36))
-                                {
-                                    if (BitConverter.ToInt32(item2.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
+                                case 0x01:
+                                    Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
+
+                                    //--Sending an Dhcp Offer                             
+                                    sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
+
+                                    break;
+                                case 0x03:
+                                    Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
+
+                                    foreach (DHCPv4Option item2 in list)
                                     {
-                                        //--Sending Dhcp Ack  
-                                        sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, receivedDhcp.xid, receivedDhcp.secs);
+                                        if (item2.optionIdBytes.Equals(0x36))
+                                        {
+                                            if (BitConverter.ToInt32(item2.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
+                                            {
+                                                //--Sending Dhcp Ack  
+                                                sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
+                                            }
+                                            else
+                                            {
+                                                //--Destination prefers other DHCP
+                                            }
+                                        }
                                     }
-                                    else
-                                    {
-                                        //--Destination prefers other DHCP
-                                    }
-                                }
+                                    break;
                             }
-                            break;
+                        }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("The DHCP-Message could not be parsed...");
                 }
             }
         }
+        catch (Exception eX)
+        {
+#if DEBUG
+            Console.WriteLine("Exception: " + eX.Message);
+#endif
+        }
+
     }
 
     public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
