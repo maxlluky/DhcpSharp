@@ -43,12 +43,9 @@ class AddressPool
     /// <returns></returns>
     public IPAddress getFreeIPAddress()
     {
-        if (true)
+        if (leasedIPAddresses.Count != freeAddressesCount)
         {
-            if (leasedIPAddresses.Count != freeAddressesCount)
-            {
-                lastIPAddress = startIPAddress;
-            }
+            lastIPAddress = startIPAddress;
 
             byte[] lastIPBytes = lastIPAddress.GetAddressBytes();
 

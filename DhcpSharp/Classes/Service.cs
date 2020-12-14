@@ -16,6 +16,10 @@ class Service
     private AddressPool addressPool;
     private Builder builder;
 
+    //--Active Device
+    private PacketDevice packetDevice;
+    private PacketCommunicator packetCommunicator;
+
     public Service(Localhost pLocalhost, AddressPool pAddressPool, Interface pInter)
     {
         localhost = pLocalhost;
@@ -26,23 +30,24 @@ class Service
     public void startListen()
     {
         //--Get active Interface/Device to use
-        PacketDevice packetDevice = localhost.getActiveInterface();
+        packetDevice = localhost.getActiveInterface();
+
         // Open the device
-        using (PacketCommunicator communicator = packetDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
-        {
-            Console.WriteLine("Listening on " + packetDevice.Description + "...");
-            Console.WriteLine("Status\t\t\tDestination MAC\t\tDHCP Message\tTransaction ID");
-            Console.WriteLine("===================================================================================");
+        packetCommunicator = packetDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000);
+        
+        Console.WriteLine("Listening on " + packetDevice.Description + "...");
+        Console.WriteLine("Status\t\t\tDestination MAC\t\tDHCP Message\tTransaction ID\t\tServer Identifier");
+        Console.WriteLine("===========================================================================================================");
 
-            //--Create Builderclass to build the networkpackets
-            builder = new Builder(addressPool, inter);
+        //--Create Builderclass to build the networkpackets
+        builder = new Builder(addressPool, inter);
 
-            //--Set a filter to reduce the traffic
-            communicator.SetFilter("udp");
+        //--Set a filter to reduce the traffic
+        packetCommunicator.SetFilter("udp");
 
-            // start the capture
-            communicator.ReceivePackets(0, receiveCallback);
-        }
+        // start the capture
+        packetCommunicator.ReceivePackets(0, receiveCallback);
+
     }
 
     // Callback function invoked by Pcap.Net for every incoming packet
@@ -80,20 +85,21 @@ class Service
                                     sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
 
                                     break;
-                                case 0x03:
-                                    Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
-
+                                case 0x03: 
                                     foreach (DHCPv4Option item2 in list)
                                     {
                                         if (item2.optionIdBytes.Equals(0x36))
                                         {
                                             if (BitConverter.ToInt32(item2.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
                                             {
+                                                Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid) + "\tSID: " + BitConverter.ToString(item2.optionValue, 0));
+
                                                 //--Sending Dhcp Ack  
                                                 sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
                                             }
                                             else
                                             {
+                                                Console.WriteLine("Client preferes other DHCP-Server!");
                                                 //--Destination prefers other DHCP
                                             }
                                         }
@@ -109,38 +115,22 @@ class Service
                 }
             }
         }
-        catch (Exception eX)
-        {
-#if DEBUG
-            Console.WriteLine("Exception: " + eX.Message);
-#endif
-        }
-
+        catch (Exception){ }
     }
 
     public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
         Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tOFFER\t\txid: " + BitConverter.ToString(pTransactionId));
-        PacketDevice packetDevice = localhost.getActiveInterface();
 
-        //--Open the output device
-        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
-        {
-            //--Send down the packet. First build the packet.
-            communicator.SendPacket(builder.buildDhcpOffer(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
-        }
+        //--Send down the packet. First build the packet.
+        packetCommunicator.SendPacket(builder.buildDhcpOffer(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
     }
 
     public void sendDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
         Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tACK\t\txid: " + BitConverter.ToString(pTransactionId));
-        PacketDevice packetDevice = localhost.getActiveInterface();
 
-        //--Open the output device
-        using (PacketCommunicator communicator = packetDevice.Open(100, PacketDeviceOpenAttributes.Promiscuous, 1000))
-        {
-            //--Send down the packet. First build the packet.
-            communicator.SendPacket(builder.buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
-        }
+        //--Send down the packet. First build the packet.
+        packetCommunicator.SendPacket(builder.buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
     }
 }

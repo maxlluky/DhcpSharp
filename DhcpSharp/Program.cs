@@ -51,12 +51,16 @@ namespace DhcpSharp
                 printInterfaceInfo(localhost.getUseableInterfaces()[i]);
             }
 
+            Console.WriteLine();
+
             //--Set the interface by Interface-Index
             Console.Write("Enter the interface number to select: ");
             int interfaceIndex = Convert.ToInt32(Console.ReadLine());
 
             inter.setInterfaceIndex(interfaceIndex);
             localhost.setActiveInterface(interfaceIndex);
+
+            Console.Clear();
 
             //--Define the Gateway
             Console.Write("Please set the Gateway-IPv4: ");
@@ -75,18 +79,11 @@ namespace DhcpSharp
         {
             foreach (DeviceAddress address in pDevice.Addresses)
             {
-                Console.WriteLine("\tAddress Family: " + address.Address.Family);
-
-                if (address.Address != null)
-                    Console.WriteLine(("\tAddress: " + address.Address));
-                if (address.Netmask != null)
-                    Console.WriteLine(("\tNetmask: " + address.Netmask));
-                if (address.Broadcast != null)
-                    Console.WriteLine(("\tBroadcast Address: " + address.Broadcast));
-                if (address.Destination != null)
-                    Console.WriteLine(("\tDestination Address: " + address.Destination));
+                if (address.Address != null & address.Address.Family.Equals(SocketAddressFamily.Internet))
+                {
+                    Console.WriteLine("\tAddress: " + address.Address);
+                }    
             }
-            Console.WriteLine();
         }
     }
 }
