@@ -1,4 +1,5 @@
 # DhcpSharp
+Minimal DHCPc4 server based on DhcpDotNet and Pcap.NET. Supports easy configuration of the gateway and address pool. The service only supports the normal DHCPv4 handshake, which is used for the allocation of IPv4 addresses.
 
 ## Copyright
 The contents and works in this software created by the software operators are subject to German copyright law. The reproduction, editing, distribution and any kind of use outside the limits of copyright law require the written consent of the respective author or creator. Downloads and copies of this software are only permitted for private, non-commercial use.
