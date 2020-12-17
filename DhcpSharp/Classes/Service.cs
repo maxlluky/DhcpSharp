@@ -34,7 +34,7 @@ class Service
 
         // Open the device
         packetCommunicator = packetDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000);
-        
+
         Console.WriteLine("Listening on " + packetDevice.Description + "...");
         Console.WriteLine("Status\t\t\tDestination MAC\t\tDHCP Message\tTransaction ID\t\tServer Identifier");
         Console.WriteLine("===========================================================================================================");
@@ -85,7 +85,7 @@ class Service
                                     sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
 
                                     break;
-                                case 0x03: 
+                                case 0x03:
                                     foreach (DHCPv4Option item2 in list)
                                     {
                                         if (item2.optionIdBytes.Equals(0x36))
@@ -115,7 +115,7 @@ class Service
                 }
             }
         }
-        catch (Exception){ }
+        catch (Exception) { }
     }
 
     public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
@@ -130,7 +130,7 @@ class Service
     {
         Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tACK\t\txid: " + BitConverter.ToString(pTransactionId));
 
-        //--Send down the packet. First build the packet.
+        //--Send down the packet. First build the packet. The Method "buildDhcpAck" will decide if it sends a ACK or NAK.
         packetCommunicator.SendPacket(builder.buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs));
     }
 }

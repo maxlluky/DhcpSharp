@@ -21,8 +21,7 @@
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>none</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -71,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Classes\AddressPool.cs" />
     <Compile Include="Classes\Builder.cs" />
+    <Compile Include="Classes\Client.cs" />
     <Compile Include="Classes\Interface.cs" />
     <Compile Include="Classes\Localhost.cs" />
     <Compile Include="Classes\Service.cs" />

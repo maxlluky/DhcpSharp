@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 
 class AddressPool
@@ -9,11 +9,13 @@ class AddressPool
 
     //--Scope
     private IPAddress startIPAddress;
-    private IPAddress lastIPAddress;
-    private long freeAddressesCount;
+    private IPAddress endIPAddress;
 
-    //--Leased Addresses
-    List<IPAddress> leasedIPAddresses = new List<IPAddress>();
+    //--List with avilabel addresses
+    List<IPAddress> freeAddressList = new List<IPAddress>();
+
+    //--List with leased addresses
+    List<IPAddress> leasedAddressList = new List<IPAddress>();
 
     public IPAddress getGatewayIpAddress()
     {
@@ -25,6 +27,11 @@ class AddressPool
         gatewyIpAddress = pGatewayIpAddress;
     }
 
+    public List<IPAddress> getFreeAddressList()
+    {
+        return freeAddressList;
+    }
+
     /// <summary>
     /// Defines a new address pool. The start and end address is specified. IP addresses can later be claimed from this range.
     /// </summary>
@@ -33,29 +40,27 @@ class AddressPool
     public void setAddressScope(IPAddress pStartIPAddress, IPAddress pEndIPAddress)
     {
         startIPAddress = pStartIPAddress;
+        endIPAddress = pEndIPAddress;
 
-        freeAddressesCount = Convert.ToInt64(pEndIPAddress.ToString().Replace(".", string.Empty)) - Convert.ToInt64(pStartIPAddress.ToString().Replace(".", string.Empty));
+        calculateFreeAddressList();
     }
 
-    /// <summary>
-    /// Calculates a new free IP address from the specified pool. If no address is free, a null value is returned.
-    /// </summary>
-    /// <returns></returns>
-    public IPAddress getFreeIPAddress()
+    private void calculateFreeAddressList()
     {
-        if (leasedIPAddresses.Count != freeAddressesCount)
+        IPAddress tempAddress = startIPAddress;
+
+        while (!tempAddress.Equals(endIPAddress))
         {
-            lastIPAddress = startIPAddress;
-
-            byte[] lastIPBytes = lastIPAddress.GetAddressBytes();
-
-            lastIPBytes[3]++;
-
+            byte[] lastIPBytes = tempAddress.GetAddressBytes();
 
             if (lastIPBytes[3] == 255)
             {
                 lastIPBytes[2] += 1;
                 lastIPBytes[3] = 1;
+            }
+            else
+            {
+                lastIPBytes[3]++;
             }
 
             if (lastIPBytes[2] == 255)
@@ -70,10 +75,29 @@ class AddressPool
                 lastIPBytes[1] = 1;
             }
 
-            lastIPAddress = IPAddress.Parse(lastIPBytes[0] + "." + lastIPBytes[1] + "." + lastIPBytes[2] + "." + lastIPBytes[3]);
-            leasedIPAddresses.Add(lastIPAddress);
+            tempAddress = IPAddress.Parse(lastIPBytes[0] + "." + lastIPBytes[1] + "." + lastIPBytes[2] + "." + lastIPBytes[3]);
 
-            return lastIPAddress;
+            if (!tempAddress.Equals(endIPAddress))
+            {
+                freeAddressList.Add(tempAddress);
+            }
+        }
+
+        Debug.WriteLine("The scope contains " + freeAddressList.Count + " free IP-Addresses");
+    }
+
+    /// <summary>
+    /// Calculates a new free IP address from the specified pool. If no address is free, a null value is returned.
+    /// </summary>
+    /// <returns></returns>
+    public IPAddress getFreeIPAddress()
+    {
+        if (leasedAddressList.Count != freeAddressList.Count & freeAddressList.Count != 0)
+        {
+            IPAddress tempAddress = freeAddressList[0];
+            freeAddressList.Remove(tempAddress);
+
+            return tempAddress;
         }
         else
         {

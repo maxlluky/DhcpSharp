@@ -4,6 +4,9 @@ using PcapDotNet.Packets.Ethernet;
 using PcapDotNet.Packets.IpV4;
 using PcapDotNet.Packets.Transport;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -14,8 +17,8 @@ class Builder
     AddressPool addressPool;
     Interface inter;
 
-    //--Variables
-    private IPAddress newClientIPAddress;
+    //--List of Clients
+    List<Client> clientList = new List<Client>();
 
     public Builder(AddressPool pAddressPool, Interface pInterface)
     {
@@ -25,8 +28,39 @@ class Builder
 
     public Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
-        //--Get a new IP from the Pool
-        newClientIPAddress = addressPool.getFreeIPAddress();
+        //--This address is used to avoide double address releases.
+        IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
+
+        //--Used to determine if a client with a transaction id was found.
+        bool clientFound = false;
+
+        //--Checks if there is a transactionId paired with a leased IPAddress.
+        if (clientList.Count != 0)
+        {
+            foreach (Client item in clientList)
+            {
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getTransactionId(), pTransactionId))
+                {
+                    newClientIPAddress = item.getIPAddress();
+                    clientFound = true;
+
+                    Debug.WriteLine("Listed Client has been found with IP-Binding: " + newClientIPAddress.ToString());
+                }
+            }
+        }
+
+
+        if (!clientFound)
+        {
+            //--Get a new IP from the Pool
+            newClientIPAddress = addressPool.getFreeIPAddress();
+
+            //--Create a new Client in List
+            Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId);
+            clientList.Add(client);
+
+            Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + BitConverter.ToString(pTransactionId));
+        }
 
         //--Get local IP and Subnet
         IPAddress ipaddress = inter.getIPAddress();
@@ -95,6 +129,34 @@ class Builder
 
     public Packet buildDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
+        //--This address is used to avoide double address releases.
+        IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
+
+        //--Used to determine if a client with a transaction id was found.
+        bool clientFound = false;
+
+        //--Checks if there is a transactionId paired with a leased IPAddress.
+        if (clientList.Count != 0)
+        {
+            foreach (Client item in clientList)
+            {
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getTransactionId(), pTransactionId))
+                {
+
+                    newClientIPAddress = item.getIPAddress();
+                    clientFound = true;
+
+                    Debug.WriteLine("Listed Client has been found with IP-Binding: " + newClientIPAddress.ToString());
+                }
+            }
+        }
+
+        if (!clientFound)
+        {
+            //--A Discovery from the Client was not recorded. Therefore the Server cannot ack a IPAddress and sends a NAK.
+            Debug.WriteLine("Server sends a NAK. There is no TransactionId paired to a leased IP-Address! The Server did not received a DISCOVER from the Client");
+        }
+
         //--Get a new IP from the Pool
         IPAddress ipaddress = inter.getIPAddress();
         IPAddress subnetmask = inter.getNetmask();

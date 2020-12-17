@@ -82,7 +82,7 @@ namespace DhcpSharp
                 if (address.Address != null & address.Address.Family.Equals(SocketAddressFamily.Internet))
                 {
                     Console.WriteLine("\tAddress: " + address.Address);
-                }    
+                }
             }
         }
     }
