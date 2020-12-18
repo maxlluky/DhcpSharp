@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Text;
 
 class Builder
 {
@@ -222,8 +223,8 @@ class Builder
         DHCPv4Option domainNameOption = new DHCPv4Option
         {
             optionId = DHCPv4OptionIds.DomainName,
-            optionLength = 0x09,
-            optionValue = new byte[] { 0x66, 0x72, 0x69, 0x74, 0x7a, 0x2e, 0x62, 0x6f, 0x78 },
+            optionLength = (byte)addressPool.getDomainName().Length,
+            optionValue = Encoding.ASCII.GetBytes(addressPool.getDomainName()),
         };
 
 

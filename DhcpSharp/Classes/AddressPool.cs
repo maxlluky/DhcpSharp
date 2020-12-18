@@ -7,6 +7,9 @@ class AddressPool
     //--Gateway 
     private IPAddress gatewyIpAddress;
 
+    //--Domain Name
+    private string domainName;
+
     //--Scope
     private IPAddress startIPAddress;
     private IPAddress endIPAddress;
@@ -25,6 +28,16 @@ class AddressPool
     public void setGatewayIpAddress(IPAddress pGatewayIpAddress)
     {
         gatewyIpAddress = pGatewayIpAddress;
+    }
+
+    public string getDomainName()
+    {
+        return domainName;
+    }
+
+    public void setDomainName(string pDomainName)
+    {
+        domainName = pDomainName;
     }
 
     public List<IPAddress> getFreeAddressList()

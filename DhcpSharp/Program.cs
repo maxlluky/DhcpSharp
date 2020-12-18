@@ -66,6 +66,10 @@ namespace DhcpSharp
             Console.Write("Please set the Gateway-IPv4: ");
             addresspool.setGatewayIpAddress(IPAddress.Parse(Console.ReadLine()));
 
+            //--Define Domain Name
+            Console.Write("Please enter Domain Name: ");
+            addresspool.setDomainName(Console.ReadLine());
+
             //--Define the Addresspool
             Console.Write("Please set start-IPv4: ");
             string start = Console.ReadLine();

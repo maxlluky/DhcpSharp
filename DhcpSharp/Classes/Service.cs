@@ -72,11 +72,11 @@ class Service
                     //--Create a dhcpOption.             
                     List<DHCPv4Option> list = new DHCPv4Option().parseDhcpOptions(dhcpv4Packet.dhcpOptions);
 
-                    foreach (DHCPv4Option item in list)
+                    foreach (DHCPv4Option dhcpMessageTypeOption in list)
                     {
-                        if (item.optionIdBytes.Equals(0x35))
+                        if (dhcpMessageTypeOption.optionIdBytes.Equals(0x35))
                         {
-                            switch (item.optionValue[0])
+                            switch (dhcpMessageTypeOption.optionValue[0])
                             {
                                 case 0x01:
                                     Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
@@ -86,13 +86,13 @@ class Service
 
                                     break;
                                 case 0x03:
-                                    foreach (DHCPv4Option item2 in list)
+                                    foreach (DHCPv4Option dhcpServerIdentifierOption in list)
                                     {
-                                        if (item2.optionIdBytes.Equals(0x36))
+                                        if (dhcpServerIdentifierOption.optionIdBytes.Equals(0x36))
                                         {
-                                            if (BitConverter.ToInt32(item2.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
+                                            if (BitConverter.ToInt32(dhcpServerIdentifierOption.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
                                             {
-                                                Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid) + "\tSID: " + BitConverter.ToString(item2.optionValue, 0));
+                                                Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid) + "\tSID: " + BitConverter.ToString(dhcpServerIdentifierOption.optionValue, 0));
 
                                                 //--Sending Dhcp Ack  
                                                 sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
@@ -100,7 +100,6 @@ class Service
                                             else
                                             {
                                                 Console.WriteLine("Client preferes other DHCP-Server!");
-                                                //--Destination prefers other DHCP
                                             }
                                         }
                                     }
