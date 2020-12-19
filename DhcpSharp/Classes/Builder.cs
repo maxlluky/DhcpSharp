@@ -57,10 +57,10 @@ class Builder
             newClientIPAddress = addressPool.getFreeIPAddress();
 
             //--Create a new Client in List
-            Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId);
+            Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress);
             clientList.Add(client);
 
-            Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + BitConverter.ToString(pTransactionId));
+            Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + BitConverter.ToString(pTransactionId) + " and MacAddress: " + pDestinationMacAddress.ToString());
         }
 
         //--Get local IP and Subnet

@@ -7,7 +7,7 @@ class Interface
     //--Classes
     private Localhost localhost = new Localhost();
 
-    //--InterfaceIndex for HwAddress
+    //--InterfaceIndex for MacAddress
     private int interfaceIndex;
 
     public Interface(Localhost pLocalhost)
@@ -29,7 +29,7 @@ class Interface
     /// Returns the Hw-Address of the active local Networkinterface used by the dhcp server
     /// </summary>
     /// <returns></returns>
-    public string getHwAddress()
+    public string getMacAddress()
     {
         //--Get all Networkinterfaces
         NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
@@ -37,23 +37,23 @@ class Interface
         //--Get active PacketDevice
         PacketDevice device = localhost.getActiveInterface();
 
-        //--Create Empty sting for HwAddress
-        string hwAddress = null;
+        //--Create Empty sting for MacAddress
+        string macAddress = null;
 
         foreach (NetworkInterface item in networkInterfaces)
         {
             if (item.Id == device.Name.Split('_')[1])
             {
-                hwAddress = item.GetPhysicalAddress().ToString();
+                macAddress = item.GetPhysicalAddress().ToString();
 
                 for (int i = 2; i <= 16; i += 3)
                 {
-                    hwAddress = hwAddress.Insert(i, ":");
+                    macAddress = macAddress.Insert(i, ":");
                 }
             }
         }
 
-        return hwAddress;
+        return macAddress;
     }
 
     public IPAddress getIPAddress()

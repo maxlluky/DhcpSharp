@@ -18,6 +18,8 @@ class Service
 
     //--Active Device
     private PacketDevice packetDevice;
+
+    //--PacketCommunicator is used to send down and receive packets
     private PacketCommunicator packetCommunicator;
 
     public Service(Localhost pLocalhost, AddressPool pAddressPool, Interface pInter)
@@ -50,7 +52,7 @@ class Service
 
     }
 
-    // Callback function invoked by Pcap.Net for every incoming packet
+    // Callback function invoked by Pcap.Net for every incoming packet. Includes packets that are send over the device.
     private void receiveCallback(Packet packet)
     {
         try
@@ -74,28 +76,33 @@ class Service
 
                     foreach (DHCPv4Option dhcpMessageTypeOption in list)
                     {
+                        //--Checks if DHCP Packet contains DHCP Message Type-Option.
                         if (dhcpMessageTypeOption.optionIdBytes.Equals(0x35))
                         {
                             switch (dhcpMessageTypeOption.optionValue[0])
                             {
+                                //--DHCP Packet is a Discover
                                 case 0x01:
                                     Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
 
                                     //--Sending an Dhcp Offer                             
-                                    sendDhcpOffer(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
+                                    sendDhcpOffer(new MacAddress(inter.getMacAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
 
                                     break;
+                                //--DHCP Packet is an Request
                                 case 0x03:
                                     foreach (DHCPv4Option dhcpServerIdentifierOption in list)
                                     {
+                                        //--Checks if the DHCP Packet contains a DHCP Server Identifier-Option.
                                         if (dhcpServerIdentifierOption.optionIdBytes.Equals(0x36))
                                         {
+                                            //--Checks if the DHCP Server Identifier equals the IP-Address of the DHCP-Server.
                                             if (BitConverter.ToInt32(dhcpServerIdentifierOption.optionValue, 0).Equals(BitConverter.ToInt32(inter.getIPAddress().GetAddressBytes(), 0)))
                                             {
                                                 Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tREQUEST\t\txid: " + BitConverter.ToString(dhcpv4Packet.xid) + "\tSID: " + BitConverter.ToString(dhcpServerIdentifierOption.optionValue, 0));
 
                                                 //--Sending Dhcp Ack  
-                                                sendDhcpAck(new MacAddress(inter.getHwAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
+                                                sendDhcpAck(new MacAddress(inter.getMacAddress()), packet.Ethernet.Source, dhcpv4Packet.xid, dhcpv4Packet.secs);
                                             }
                                             else
                                             {
