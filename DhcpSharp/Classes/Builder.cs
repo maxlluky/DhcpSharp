@@ -40,7 +40,7 @@ class Builder
         {
             foreach (Client item in clientList)
             {
-                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getTransactionId(), pTransactionId))
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getMacAddress(), pDestinationMacAddress))
                 {
                     newClientIPAddress = item.getIPAddress();
                     clientFound = true;
@@ -141,7 +141,7 @@ class Builder
         {
             foreach (Client item in clientList)
             {
-                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getTransactionId(), pTransactionId))
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getMacAddress(), pDestinationMacAddress))
                 {
 
                     newClientIPAddress = item.getIPAddress();
