@@ -15,11 +15,11 @@ using System.Text;
 class Builder
 {
     //--Classes
-    AddressPool addressPool;
-    Interface inter;
+    private AddressPool addressPool;
+    private Interface inter;
 
     //--List of Clients
-    List<Client> clientList = new List<Client>();
+    private List<Client> clientList = new List<Client>();
 
     public Builder(AddressPool pAddressPool, Interface pInterface)
     {
