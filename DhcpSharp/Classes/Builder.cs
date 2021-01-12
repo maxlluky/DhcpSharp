@@ -40,9 +40,9 @@ class Builder
         {
             foreach (Client item in clientList)
             {
-                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getMacAddress(), pDestinationMacAddress))
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.macAddress, pDestinationMacAddress))
                 {
-                    newClientIPAddress = item.getIPAddress();
+                    newClientIPAddress = item.ipaddress;
                     clientFound = true;
 
                     Debug.WriteLine("Listed Client has been found with IP-Binding: " + newClientIPAddress.ToString());
@@ -141,10 +141,10 @@ class Builder
         {
             foreach (Client item in clientList)
             {
-                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.getMacAddress(), pDestinationMacAddress))
+                if (StructuralComparisons.StructuralEqualityComparer.Equals(item.macAddress, pDestinationMacAddress))
                 {
 
-                    newClientIPAddress = item.getIPAddress();
+                    newClientIPAddress = item.ipaddress;
                     clientFound = true;
 
                     Debug.WriteLine("Listed Client has been found with IP-Binding: " + newClientIPAddress.ToString());

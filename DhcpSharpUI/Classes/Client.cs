@@ -3,17 +3,15 @@ using System.Net;
 class Client
 {
     public string hostname { get; set; }
-    public IPAddress ipAddress { get; set; }
+    public IPAddress ipaddress { get; set; }
     public byte[] transactionId { get; set; }
     public MacAddress macAddress { get; set; }
-    public string status { get; set; }
 
-    public Client(string pHostname, IPAddress pIPAddress, byte[] pTransactionId, MacAddress pMacAddress, string pStatus)
+    public Client(string pHostname, IPAddress pIPAddress, byte[] pTransactionId, MacAddress pMacAddress)
     {
         hostname = pHostname;
-        ipAddress = pIPAddress;
+        ipaddress = pIPAddress;
         transactionId = pTransactionId;
         macAddress = pMacAddress;
-        status = pStatus;
     }
 }

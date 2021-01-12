@@ -47,7 +47,7 @@ class Builder
             {
                 if (StructuralComparisons.StructuralEqualityComparer.Equals(item.transactionId, pTransactionId))
                 {
-                    newClientIPAddress = item.ipAddress;
+                    newClientIPAddress = item.ipaddress;
                     clientFound = true;
 
                     Debug.WriteLine("Listed Client has been found with IP-Binding: " + newClientIPAddress.ToString());
@@ -62,7 +62,7 @@ class Builder
             newClientIPAddress = addressPool.getFreeIPAddress();
 
             //--Create a new Client in List
-            Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress, "Open");
+            Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress);
             clientList.Add(client);
 
             mainWindow.Dispatcher.Invoke(() =>
@@ -152,10 +152,8 @@ class Builder
                 if (StructuralComparisons.StructuralEqualityComparer.Equals(item.transactionId, pTransactionId))
                 {
 
-                    newClientIPAddress = item.ipAddress;
+                    newClientIPAddress = item.ipaddress;
                     clientFound = true;
-
-                    item.status = "Acknowledged";
 
                     mainWindow.Dispatcher.Invoke(() =>
                     {
