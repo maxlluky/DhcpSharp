@@ -1,5 +1,5 @@
 # DhcpSharp
-Minimal DHCPc4 server based on DhcpDotNet and Pcap.NET. Supports easy configuration of the gateway and address pool. The service only supports the normal DHCPv4 handshake, which is used for the allocation of IPv4 addresses.
+Minimal DHCPv4 server based on DhcpDotNet and Pcap.NET. Supports easy configuration of the gateway and address pool. The service only supports the normal DHCPv4 handshake, which is used for the allocation of IPv4 addresses.
 
 ## See how its done
 In the "Wireshark" folder there are two examples for IPv4 and IPv6 of how a Dhcp process can look. To put it simply, DhcpSharp was reconstructed on the basis of these examples. The library "DhcpDotNet" was used to create the DhcpLayer. The library "Pcap.NET" was used to encapsulate the DhcpLayer and send the network packets.
