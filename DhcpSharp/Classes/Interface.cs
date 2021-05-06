@@ -4,10 +4,7 @@ using System.Net.NetworkInformation;
 
 class Interface
 {
-    //--Classes
     private Localhost localhost = new Localhost();
-
-    //--InterfaceIndex for MacAddress
     private int interfaceIndex;
 
     public Interface(Localhost pLocalhost)
@@ -31,13 +28,8 @@ class Interface
     /// <returns></returns>
     public string getMacAddress()
     {
-        //--Get all Networkinterfaces
         NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-
-        //--Get active PacketDevice
         PacketDevice device = localhost.getActiveInterface();
-
-        //--Create Empty sting for MacAddress
         string macAddress = null;
 
         foreach (NetworkInterface item in networkInterfaces)
