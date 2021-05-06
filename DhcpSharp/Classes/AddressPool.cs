@@ -4,20 +4,12 @@ using System.Net;
 
 class AddressPool
 {
-    //--Gateway 
     private IPAddress gatewyIpAddress;
-
-    //--Domain Name
     private string domainName;
-
-    //--Scope
     private IPAddress startIPAddress;
     private IPAddress endIPAddress;
 
-    //--List with avilabel addresses
     List<IPAddress> freeAddressList = new List<IPAddress>();
-
-    //--List with leased addresses
     List<IPAddress> leasedAddressList = new List<IPAddress>();
 
     public IPAddress getGatewayIpAddress()
