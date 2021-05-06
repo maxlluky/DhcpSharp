@@ -14,11 +14,8 @@ using System.Text;
 
 class Builder
 {
-    //--Classes
     private AddressPool addressPool;
     private Interface inter;
-
-    //--List of Clients
     private List<Client> clientList = new List<Client>();
 
     public Builder(AddressPool pAddressPool, Interface pInterface)
@@ -28,14 +25,10 @@ class Builder
     }
 
     public Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
-    {
-        //--This address is used to avoide double address releases.
+    {        
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
-
-        //--Used to determine if a client with a transaction id was found.
         bool clientFound = false;
-
-        //--Checks if there is a transactionId paired with a leased IPAddress.
+        
         if (clientList.Count != 0)
         {
             foreach (Client item in clientList)
@@ -53,20 +46,15 @@ class Builder
 
         if (!clientFound)
         {
-            //--Get a new IP from the Pool
             newClientIPAddress = addressPool.getFreeIPAddress();
-
-            //--Create a new Client in List
             Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress);
             clientList.Add(client);
 
             Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + BitConverter.ToString(pTransactionId) + " and MacAddress: " + pDestinationMacAddress.ToString());
         }
 
-        //--Get local IP and Subnet
         IPAddress ipaddress = inter.getIPAddress();
 
-        //--Create the DHCP Option
         DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
             optionId = DHCPv4OptionIds.DhcpMessageType,
@@ -81,7 +69,6 @@ class Builder
             optionValue = ipaddress.GetAddressBytes(),
         };
 
-        //--DHCP Payload
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
             op = 0x02,
@@ -96,7 +83,6 @@ class Builder
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
         };
 
-        //--Create the packets layers
         EthernetLayer ethernetLayer = new EthernetLayer
         {
             Source = pSourceMacAddress,
@@ -121,22 +107,15 @@ class Builder
             Data = new Datagram(dhcpPacket.buildPacket()),
         };
 
-        //--Create the builder that will build our packets
         PacketBuilder builder = new PacketBuilder(ethernetLayer, ipV4Layer, udpLayer, payloadLayer);
-
-        //--Build the packet
         return builder.Build(DateTime.Now);
     }
 
     public Packet buildDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
     {
-        //--This address is used to avoide double address releases.
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
-
-        //--Used to determine if a client with a transaction id was found.
         bool clientFound = false;
 
-        //--Checks if there is a transactionId paired with a leased IPAddress.
         if (clientList.Count != 0)
         {
             foreach (Client item in clientList)
@@ -153,16 +132,13 @@ class Builder
         }
 
         if (!clientFound)
-        {
-            //--A Discovery from the Client was not recorded. Therefore the Server cannot ack a IPAddress and sends a NAK.
+        {            
             Debug.WriteLine("Server sends a NAK. There is no TransactionId paired to a leased IP-Address! The Server did not received a DISCOVER from the Client");
         }
 
-        //--Get a new IP from the Pool
         IPAddress ipaddress = inter.getIPAddress();
         IPAddress subnetmask = inter.getNetmask();
 
-        //--Create the DHCP Option
         DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
             optionId = DHCPv4OptionIds.DhcpMessageType,
@@ -227,8 +203,6 @@ class Builder
             optionValue = Encoding.ASCII.GetBytes(addressPool.getDomainName()),
         };
 
-
-        //--DHCP Payload
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
         {
             op = 0x02,
@@ -243,7 +217,6 @@ class Builder
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).Concat(ipAddressLeaseTimeOption.buildDhcpOption()).Concat(renewalTimeValueOption.buildDhcpOption()).Concat(rebindTimeValueOption.buildDhcpOption()).Concat(subnetMaskOption.buildDhcpOption()).Concat(routerOption.buildDhcpOption()).Concat(domainNameServerOption.buildDhcpOption()).Concat(domainNameOption.buildDhcpOption()).ToArray(),
         };
 
-        //--Create the packets layers
         EthernetLayer ethernetLayer = new EthernetLayer
         {
             Source = pSourceMacAddress,
@@ -268,10 +241,7 @@ class Builder
             Data = new Datagram(dhcpPacket.buildPacket()),
         };
 
-        //--Create the builder that will build our packets
         PacketBuilder builder = new PacketBuilder(ethernetLayer, ipV4Layer, udpLayer, payloadLayer);
-
-        //--Build the packet
         return builder.Build(DateTime.Now);
     }
 }
