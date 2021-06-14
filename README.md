@@ -4,6 +4,9 @@ Minimal DHCPv4 server based on DhcpDotNet and Pcap.NET. Supports easy configurat
 ## See how its done
 In the "Wireshark" folder there are two examples for IPv4 and IPv6 of how a Dhcp process can look like. To put it simply, DhcpSharp was reconstructed on the basis of these examples. The library "DhcpDotNet" was used to create the DHCP-Packets. In addition the library "Pcap.NET" was used to encapsulate the DHCP Packets and send them down.
 
+## Coming soon
+I am planning to implement the DHCP lease time mechanism in the near future, allowing clients to be reassigned an IP address after the lease time has expired. 
+
 ## Copyright
 The contents and works in this software created by the software operators are subject to German copyright law. The reproduction, editing, distribution and any kind of use outside the limits of copyright law require the written consent of the respective author or creator. Downloads and copies of this software are only permitted for private, non-commercial use.
 
