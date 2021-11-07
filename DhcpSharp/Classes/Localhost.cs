@@ -1,23 +1,22 @@
-﻿using PcapDotNet.Core;
-using System.Collections.Generic;
+﻿using SharpPcap;
 
 class Localhost
 {
-    private static IList<LivePacketDevice> allDevices = LivePacketDevice.AllLocalMachine;
-    private static PacketDevice packetDevice;
+    private static CaptureDeviceList deviceList = CaptureDeviceList.Instance;
+    private static ILiveDevice liveDevice;
 
-    public IList<LivePacketDevice> getUseableInterfaces()
+    public CaptureDeviceList getUseableInterfaces()
     {
-        return allDevices;
+        return deviceList;
     }
 
-    public PacketDevice getActiveInterface()
+    public ILiveDevice getActiveInterface()
     {
-        return packetDevice;
+        return liveDevice;
     }
 
     public void setActiveInterface(int pNr)
     {
-        packetDevice = allDevices[pNr];
+        liveDevice = deviceList[pNr];
     }
 }

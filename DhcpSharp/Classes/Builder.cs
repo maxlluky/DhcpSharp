@@ -1,8 +1,5 @@
 ﻿using DhcpDotNet;
-using PcapDotNet.Packets;
-using PcapDotNet.Packets.Ethernet;
-using PcapDotNet.Packets.IpV4;
-using PcapDotNet.Packets.Transport;
+using PacketDotNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,21 +11,19 @@ using System.Text;
 
 class Builder
 {
-    private AddressPool addressPool;
     private Interface inter;
     private List<Client> clientList = new List<Client>();
 
-    public Builder(AddressPool pAddressPool, Interface pInterface)
+    public Builder(Interface pInterface)
     {
-        addressPool = pAddressPool;
         inter = pInterface;
     }
 
-    public Packet buildDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
-    {        
+    public Packet buildDhcpOffer(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs, Subnet pSubnet)
+    {
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
         bool clientFound = false;
-        
+
         if (clientList.Count != 0)
         {
             foreach (Client item in clientList)
@@ -46,7 +41,7 @@ class Builder
 
         if (!clientFound)
         {
-            newClientIPAddress = addressPool.getFreeIPAddress();
+            newClientIPAddress = pSubnet.getFreeIPAddress();
             Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress);
             clientList.Add(client);
 
@@ -83,35 +78,18 @@ class Builder
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
         };
 
-        EthernetLayer ethernetLayer = new EthernetLayer
-        {
-            Source = pSourceMacAddress,
-            Destination = pDestinationMacAddress
-        };
+        EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
+        IPv4Packet ipv4Packet = new IPv4Packet(ipaddress, newClientIPAddress);
+        UdpPacket udpPacket = new UdpPacket(67, 68);
 
-        IpV4Layer ipV4Layer = new IpV4Layer
-        {
-            Source = new IpV4Address(ipaddress.ToString()),
-            CurrentDestination = new IpV4Address(newClientIPAddress.ToString()),
-            Ttl = 128,
-        };
+        udpPacket.PayloadData = dhcpPacket.buildPacket();
+        ipv4Packet.PayloadPacket = udpPacket;
+        ethernetPacket.PayloadPacket = ipv4Packet;
 
-        UdpLayer udpLayer = new UdpLayer
-        {
-            SourcePort = (ushort)67,
-            DestinationPort = (ushort)68,
-        };
-
-        PayloadLayer payloadLayer = new PayloadLayer
-        {
-            Data = new Datagram(dhcpPacket.buildPacket()),
-        };
-
-        PacketBuilder builder = new PacketBuilder(ethernetLayer, ipV4Layer, udpLayer, payloadLayer);
-        return builder.Build(DateTime.Now);
+        return ethernetPacket;
     }
 
-    public Packet buildDhcpAck(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs)
+    public Packet buildDhcpAck(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs, Subnet pSubnet)
     {
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
         bool clientFound = false;
@@ -132,7 +110,7 @@ class Builder
         }
 
         if (!clientFound)
-        {            
+        {
             Debug.WriteLine("Server sends a NAK. There is no TransactionId paired to a leased IP-Address! The Server did not received a DISCOVER from the Client");
         }
 
@@ -186,7 +164,7 @@ class Builder
         {
             optionId = DHCPv4OptionIds.Router,
             optionLength = 0x04,
-            optionValue = addressPool.getGatewayIpAddress().GetAddressBytes(),
+            optionValue = IPAddress.Parse(pSubnet.gatewayIp).GetAddressBytes(),
         };
 
         DHCPv4Option domainNameServerOption = new DHCPv4Option
@@ -199,8 +177,8 @@ class Builder
         DHCPv4Option domainNameOption = new DHCPv4Option
         {
             optionId = DHCPv4OptionIds.DomainName,
-            optionLength = (byte)addressPool.getDomainName().Length,
-            optionValue = Encoding.ASCII.GetBytes(addressPool.getDomainName()),
+            optionLength = (byte)pSubnet.domainName.Length,
+            optionValue = Encoding.ASCII.GetBytes(pSubnet.domainName),
         };
 
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
@@ -217,31 +195,14 @@ class Builder
             dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).Concat(ipAddressLeaseTimeOption.buildDhcpOption()).Concat(renewalTimeValueOption.buildDhcpOption()).Concat(rebindTimeValueOption.buildDhcpOption()).Concat(subnetMaskOption.buildDhcpOption()).Concat(routerOption.buildDhcpOption()).Concat(domainNameServerOption.buildDhcpOption()).Concat(domainNameOption.buildDhcpOption()).ToArray(),
         };
 
-        EthernetLayer ethernetLayer = new EthernetLayer
-        {
-            Source = pSourceMacAddress,
-            Destination = pDestinationMacAddress
-        };
+        EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
+        IPv4Packet ipv4Packet = new IPv4Packet(ipaddress, newClientIPAddress);
+        UdpPacket udpPacket = new UdpPacket(67, 68);
 
-        IpV4Layer ipV4Layer = new IpV4Layer
-        {
-            Source = new IpV4Address(ipaddress.ToString()),
-            CurrentDestination = new IpV4Address(newClientIPAddress.ToString()),
-            Ttl = 128,
-        };
+        udpPacket.PayloadData = dhcpPacket.buildPacket();
+        ipv4Packet.PayloadPacket = udpPacket;
+        ethernetPacket.PayloadPacket = ipv4Packet;
 
-        UdpLayer udpLayer = new UdpLayer
-        {
-            SourcePort = (ushort)67,
-            DestinationPort = (ushort)68,
-        };
-
-        PayloadLayer payloadLayer = new PayloadLayer
-        {
-            Data = new Datagram(dhcpPacket.buildPacket()),
-        };
-
-        PacketBuilder builder = new PacketBuilder(ethernetLayer, ipV4Layer, udpLayer, payloadLayer);
-        return builder.Build(DateTime.Now);
+        return ethernetPacket;
     }
 }

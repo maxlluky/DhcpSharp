@@ -1,5 +1,4 @@
-﻿using PcapDotNet.Core;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 
 class Interface

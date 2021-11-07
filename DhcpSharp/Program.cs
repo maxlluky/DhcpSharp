@@ -1,6 +1,8 @@
-﻿using PcapDotNet.Core;
+﻿using Newtonsoft.Json;
+using SharpPcap;
 using System;
-using System.Net;
+using System.Diagnostics;
+using System.IO;
 
 namespace DhcpSharp
 {
@@ -8,9 +10,10 @@ namespace DhcpSharp
     {
         //--Classes
         private static Localhost localhost = new Localhost();
-        private static AddressPool addresspool = new AddressPool();
+        private static SubnetList subnetList = new SubnetList();
         private static Interface inter = new Interface(localhost);
-        private static Service service = new Service(localhost, addresspool, inter);
+        private static Service service = new Service(localhost, inter, subnetList);
+
 
         static void Main(string[] args)
         {
@@ -37,7 +40,7 @@ namespace DhcpSharp
             // Print the list
             for (int i = 0; i != localhost.getUseableInterfaces().Count; ++i)
             {
-                LivePacketDevice device = localhost.getUseableInterfaces()[i];
+                ILiveDevice device = localhost.getUseableInterfaces()[i];
                 if (device.Description != null)
                 {
                     Console.WriteLine(i + ": " + device.Description);
@@ -46,9 +49,6 @@ namespace DhcpSharp
                 {
                     Console.WriteLine(i + ": " + " (No description available)");
                 }
-
-                // Print IP-Information for each Interface
-                printInterfaceInfo(localhost.getUseableInterfaces()[i]);
             }
 
             Console.WriteLine();
@@ -62,32 +62,28 @@ namespace DhcpSharp
 
             Console.Clear();
 
-            //--Define the Gateway
-            Console.Write("Please set the Gateway-IPv4: ");
-            addresspool.setGatewayIpAddress(IPAddress.Parse(Console.ReadLine()));
-
-            //--Define Domain Name
-            Console.Write("Please enter Domain Name: ");
-            addresspool.setDomainName(Console.ReadLine());
-
-            //--Define the Addresspool
-            Console.Write("Please set start-IPv4: ");
-            string start = Console.ReadLine();
-            Console.Write("Please set end-IPv4: ");
-            string end = Console.ReadLine();
-
-            addresspool.setAddressScope(IPAddress.Parse(start), IPAddress.Parse(end));
-        }
-
-        private static void printInterfaceInfo(IPacketDevice pDevice)
-        {
-            foreach (DeviceAddress address in pDevice.Addresses)
+            //--Read subnets from Config-file
+            using (StreamReader streamReader = new StreamReader("config"))
             {
-                if (address.Address != null & address.Address.Family.Equals(SocketAddressFamily.Internet))
+                while (!streamReader.EndOfStream)
                 {
-                    Console.WriteLine("\tAddress: " + address.Address);
+                    Subnet tempSubnet = JsonConvert.DeserializeObject<Subnet>(streamReader.ReadLine());
+
+                    if (tempSubnet != null)
+                    {
+                        tempSubnet.calculateAddresses();
+                        subnetList.list.Add(tempSubnet);
+                    }
                 }
             }
+
+            foreach (Subnet subnet in subnetList.list)
+            {
+                Debug.WriteLine("VLAN: {0} Domain Name: {1} Gateway {2} Range-Start {3} Range-End {4}", subnet.vlanID, subnet.domainName, subnet.gatewayIp, subnet.rangeStartIp, subnet.rangeEndIp);
+
+            }
+
+            Debug.WriteLine("Subnet configurations found: {0}", subnetList.list.Count);
         }
     }
 }
