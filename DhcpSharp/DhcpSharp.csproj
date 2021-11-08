@@ -98,7 +98,6 @@
   <ItemGroup>
     <Compile Include="Classes\Builder.cs" />
     <Compile Include="Classes\Client.cs" />
-    <Compile Include="Classes\Interface.cs" />
     <Compile Include="Classes\Localhost.cs" />
     <Compile Include="Classes\Service.cs" />
     <Compile Include="Classes\Subnet.cs" />

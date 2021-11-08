@@ -11,8 +11,7 @@ namespace DhcpSharp
         //--Classes
         private static Localhost localhost = new Localhost();
         private static SubnetList subnetList = new SubnetList();
-        private static Interface inter = new Interface(localhost);
-        private static Service service = new Service(localhost, inter, subnetList);
+        private static Service service = new Service(localhost, subnetList);
 
 
         static void Main(string[] args)
@@ -57,7 +56,6 @@ namespace DhcpSharp
             Console.Write("Enter the interface number to select: ");
             int interfaceIndex = Convert.ToInt32(Console.ReadLine());
 
-            inter.setInterfaceIndex(interfaceIndex);
             localhost.setActiveInterface(interfaceIndex);
 
             Console.Clear();
@@ -79,7 +77,7 @@ namespace DhcpSharp
 
             foreach (Subnet subnet in subnetList.list)
             {
-                Debug.WriteLine("VLAN: {0} Domain Name: {1} Gateway {2} Range-Start {3} Range-End {4}", subnet.vlanID, subnet.domainName, subnet.gatewayIp, subnet.rangeStartIp, subnet.rangeEndIp);
+                Debug.WriteLine("listenIp:{0} dhcpIp:{1} dnsIp:{2} gatewayIp:{3} Domain Name:{4} Range-Start:{5} Range-End:{6} Netmask:{7}", subnet.listenIp, subnet.dhcpIp, subnet.dnsIp, subnet.gatewayIp, subnet.domainName, subnet.rangeStartIp, subnet.rangeEndIp, subnet.netmask);
 
             }
 

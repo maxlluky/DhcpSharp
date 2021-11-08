@@ -11,15 +11,9 @@ using System.Text;
 
 class Builder
 {
-    private Interface inter;
     private List<Client> clientList = new List<Client>();
 
-    public Builder(Interface pInterface)
-    {
-        inter = pInterface;
-    }
-
-    public Packet buildDhcpOffer(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs, Subnet pSubnet)
+    public Packet buildDhcpOffer(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
     {
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
         bool clientFound = false;
@@ -45,10 +39,10 @@ class Builder
             Client client = new Client(newClientIPAddress.ToString(), newClientIPAddress, pTransactionId, pDestinationMacAddress);
             clientList.Add(client);
 
-            Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + BitConverter.ToString(pTransactionId) + " and MacAddress: " + pDestinationMacAddress.ToString());
+            Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + pTransactionId + " and MacAddress: " + pDestinationMacAddress.ToString());
         }
 
-        IPAddress ipaddress = inter.getIPAddress();
+        IPAddress ipaddress = IPAddress.Parse(pSubnet.dhcpIp);
 
         DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
@@ -69,8 +63,8 @@ class Builder
             op = 0x02,
             htype = 0x01,
             hlen = 0x06,
-            xid = pTransactionId,
-            secs = pSecs,
+            xid = BitConverter.GetBytes(pTransactionId),
+            secs = BitConverter.GetBytes(pSecs),
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
             yiaddr = newClientIPAddress.GetAddressBytes(),
             siaddr = ipaddress.GetAddressBytes(),
@@ -89,7 +83,7 @@ class Builder
         return ethernetPacket;
     }
 
-    public Packet buildDhcpAck(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, byte[] pTransactionId, byte[] pSecs, Subnet pSubnet)
+    public Packet buildDhcpAck(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
     {
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
         bool clientFound = false;
@@ -114,8 +108,8 @@ class Builder
             Debug.WriteLine("Server sends a NAK. There is no TransactionId paired to a leased IP-Address! The Server did not received a DISCOVER from the Client");
         }
 
-        IPAddress ipaddress = inter.getIPAddress();
-        IPAddress subnetmask = inter.getNetmask();
+        IPAddress ipaddress = IPAddress.Parse(pSubnet.dhcpIp);
+        IPAddress subnetmask = IPAddress.Parse(pSubnet.netmask);
 
         DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
@@ -171,7 +165,7 @@ class Builder
         {
             optionId = DHCPv4OptionIds.DomainNameServer,
             optionLength = 0x04,
-            optionValue = ipaddress.GetAddressBytes(),
+            optionValue = IPAddress.Parse(pSubnet.dnsIp).GetAddressBytes(),
         };
 
         DHCPv4Option domainNameOption = new DHCPv4Option
@@ -186,8 +180,8 @@ class Builder
             op = 0x02,
             htype = 0x01,
             hlen = 0x06,
-            xid = pTransactionId,
-            secs = pSecs,
+            xid = BitConverter.GetBytes(pTransactionId),
+            secs = BitConverter.GetBytes(pSecs),
             ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
             yiaddr = newClientIPAddress.GetAddressBytes(),
             siaddr = ipaddress.GetAddressBytes(),

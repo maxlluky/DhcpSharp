@@ -3,11 +3,41 @@ using System.Net;
 
 public class Subnet
 {
-    public string vlanID;
-    public string domainName;
+    /// <summary>
+    /// 
+    /// </summary>
+    public string listenIp;
+
+    /// <summary>
+    /// Interface IP from DHCP-Server
+    /// </summary>
+    public string dhcpIp;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string dnsIp;
+
+    /// <summary>
+    /// IP-Address of the Subnet-Gateway
+    /// </summary>
     public string gatewayIp;
+
+    /// <summary>
+    /// Domain Name of the Subnet
+    /// </summary>
+    public string domainName;
+
+    /// <summary>
+    /// DHCP-Range of the Subnet
+    /// </summary>
     public string rangeStartIp;
     public string rangeEndIp;
+
+    /// <summary>
+    /// Networkmask of the Subnet 
+    /// </summary>
+    public string netmask;
 
     private List<IPAddress> freeAddressList = new List<IPAddress>();
     private List<IPAddress> leasedAddressList = new List<IPAddress>();
