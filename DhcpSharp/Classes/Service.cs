@@ -85,11 +85,17 @@ class Service
                                     //--Check Subnet-Config
                                     foreach (Subnet subnet in subnetList.list)
                                     {
-                                        if (ipv4Packet.DestinationAddress.ToString() == subnet.listenIp.ToString())
+                                        if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
                                         {
                                             //--Match found. Response to VLAN now!
                                             sendDhcpResponse(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                         }
+                                    }
+                                    
+                                    if (!con_found & subnetlist.list[0].listenIp == null)
+                                    {
+                                        //--No Match found! Sending offer with default Subnet.
+                                        sendDhcpResponse(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                     }
                                     break;
                             }
