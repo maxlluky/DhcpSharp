@@ -2,7 +2,6 @@
 using PacketDotNet.DhcpV4;
 using SharpPcap;
 using System;
-using System.Diagnostics;
 using System.Net.NetworkInformation;
 
 class Service
@@ -61,28 +60,19 @@ class Service
                                 //--Packet is a Discover
                                 case 0x01:
                                     //--Check Subnet-Config
-                                    bool con_found = false;
                                     foreach (Subnet subnet in subnetList.list)
                                     {
                                         if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
                                         {
-                                            //--Match found! Response to VLAN now.
-                                            con_found = true;                                            
+                                            //--Match found! Response to VLAN now.                                           
                                             sendDhcpOffer(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                         }
                                     }
-                                    
-                                    if (!con_found & subnetlist.list[0].listenIp == null)
-                                    {
-                                        //--No Match found! Sending offer with default Subnet.
-                                        sendDhcpOffer(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
-                                    }
-                                    
                                     break;
 
                                 //--Packet is an Request
                                 case 0x03:
-                                    //--Check Subnet-Config
+                                    //--Check Subnet-Config                                    
                                     foreach (Subnet subnet in subnetList.list)
                                     {
                                         if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
@@ -90,12 +80,6 @@ class Service
                                             //--Match found. Response to VLAN now!
                                             sendDhcpResponse(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                         }
-                                    }
-                                    
-                                    if (!con_found & subnetlist.list[0].listenIp == null)
-                                    {
-                                        //--No Match found! Sending offer with default Subnet.
-                                        sendDhcpResponse(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                     }
                                     break;
                             }
