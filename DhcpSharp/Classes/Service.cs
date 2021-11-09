@@ -61,15 +61,23 @@ class Service
                                 //--Packet is a Discover
                                 case 0x01:
                                     //--Check Subnet-Config
+                                    bool con_found = false;
                                     foreach (Subnet subnet in subnetList.list)
                                     {
-                                        if (ipv4Packet.DestinationAddress.ToString() == subnet.listenIp.ToString())
+                                        if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
                                         {
-                                            Debug.WriteLine("Sending DHCP-Offer...");
-                                            //--Match found. Response to VLAN now!
+                                            //--Match found! Response to VLAN now.
+                                            con_found = true;                                            
                                             sendDhcpOffer(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
                                         }
                                     }
+                                    
+                                    if (!con_found & subnetlist.list[0].listenIp == null)
+                                    {
+                                        //--No Match found! Sending offer with default Subnet.
+                                        sendDhcpOffer(liveDevice.MacAddress, dhcpv4Packet.ClientHardwareAddress, dhcpv4Packet.TransactionId, dhcpv4Packet.Secs, subnet);
+                                    }
+                                    
                                     break;
 
                                 //--Packet is an Request
