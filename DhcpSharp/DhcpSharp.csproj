@@ -13,6 +13,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="distributed.ico" />
   </ItemGroup>
 

@@ -1,0 +1,5 @@
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\DhcpSharp.exe
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\DhcpSharp.runtimeconfig.json
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\DhcpSharp.deps.json

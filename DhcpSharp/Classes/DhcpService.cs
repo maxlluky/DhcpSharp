@@ -3,14 +3,14 @@ using PacketDotNet.DhcpV4;
 using SharpPcap;
 using System.Net.NetworkInformation;
 
-class Service
+class DhcpService
 {
-    private static Localhost localhost;
-    private SubnetList subnetList;
-    private Builder builder;
+    private Interface localhost;
+    private Config subnetList;
+    private PacketBuilder builder;
     private ILiveDevice liveDevice;
 
-    public Service(Localhost pLocalhost, SubnetList pSubnetList)
+    public DhcpService(Interface pLocalhost, Config pSubnetList)
     {
         localhost = pLocalhost;
         subnetList = pSubnetList;
@@ -21,11 +21,11 @@ class Service
         liveDevice = localhost.getActiveInterface();
         liveDevice.Open(DeviceModes.Promiscuous, 1000);
 
-        Console.WriteLine("Listening on {0} - Using ({1}) Subnet-configurations!\n", liveDevice.Description, subnetList.list.Count);
-        Console.WriteLine("Status\t\tDestination MAC\t\tDHCP Message\tTransaction ID\t\tServer Identifier");
+        Console.WriteLine("Listening on {0} - Using ({1}) Subnet-configurations!\n", liveDevice.Description, subnetList.subnetList.Count);
+        Console.WriteLine("Status\t\tDestination MAC\t\tDHCP Message\t\tTransaction ID\t\tServer Identifier");
         Console.WriteLine("===========================================================================================================");
 
-        builder = new Builder();
+        builder = new PacketBuilder();
 
         liveDevice.OnPacketArrival +=
            new PacketArrivalEventHandler(device_OnPacketArrival);
@@ -59,7 +59,7 @@ class Service
                                 //--Packet is a Discover
                                 case 0x01:
                                     //--Check Subnet-Config
-                                    foreach (Subnet subnet in subnetList.list)
+                                    foreach (Subnet subnet in subnetList.subnetList)
                                     {
                                         if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
                                         {
@@ -72,7 +72,7 @@ class Service
                                 //--Packet is an Request
                                 case 0x03:
                                     //--Check Subnet-Config                                    
-                                    foreach (Subnet subnet in subnetList.list)
+                                    foreach (Subnet subnet in subnetList.subnetList)
                                     {
                                         if (ipv4Packet.SourceAddress.ToString() == subnet.listenIp.ToString())
                                         {

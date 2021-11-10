@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 
-class Builder
+class PacketBuilder
 {
     private List<Client> clientList = new List<Client>();
 

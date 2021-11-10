@@ -7,9 +7,9 @@ namespace DhcpSharp
     class Program
     {
         //--Classes
-        private static Localhost localhost = new Localhost();
-        private static SubnetList subnetList = new SubnetList();
-        private static Service service = new Service(localhost, subnetList);
+        private static Interface localhost = new Interface();
+        private static Config subnetList = new Config();
+        private static DhcpService service = new DhcpService(localhost, subnetList);
 
         static void Main(string[] args)
         {
@@ -70,7 +70,7 @@ namespace DhcpSharp
                     if (tempSubnet != null)
                     {
                         tempSubnet.calculateAddresses();
-                        subnetList.list.Add(tempSubnet);
+                        subnetList.subnetList.Add(tempSubnet);
                     }
                 }
             }

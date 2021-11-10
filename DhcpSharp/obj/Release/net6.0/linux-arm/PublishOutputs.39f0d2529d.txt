@@ -1,0 +1,3 @@
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\linux-arm\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\linux-arm\config
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\publish\linux-arm\DhcpSharp

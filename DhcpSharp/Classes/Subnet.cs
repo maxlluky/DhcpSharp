@@ -3,7 +3,7 @@
 public class Subnet
 {
     /// <summary>
-    /// 
+    /// The IP-Address the Server answers i.e. 0.0.0.0 (or the IP from the SVI)
     /// </summary>
     public string listenIp;
 
@@ -13,7 +13,7 @@ public class Subnet
     public string dhcpIp;
 
     /// <summary>
-    /// 
+    /// The IP from the DNS-Server
     /// </summary>
     public string dnsIp;
 

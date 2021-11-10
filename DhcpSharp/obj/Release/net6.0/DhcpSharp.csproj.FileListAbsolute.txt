@@ -1,0 +1,17 @@
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\DhcpSharp.exe
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\DhcpSharp.deps.json
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\DhcpSharp.runtimeconfig.json
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\ref\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.csproj.AssemblyReference.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.AssemblyInfoInputs.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.AssemblyInfo.cs
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.csproj.CoreCompileInputs.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.csproj.Fody.CopyLocal.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\ref\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\DhcpSharp.genruntimeconfig.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\config

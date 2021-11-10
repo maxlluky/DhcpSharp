@@ -1,0 +1,16 @@
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\DhcpSharp
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\DhcpSharp.deps.json
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\DhcpSharp.runtimeconfig.json
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\ref\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.AssemblyInfoInputs.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.AssemblyInfo.cs
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.csproj.CoreCompileInputs.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.csproj.Fody.CopyLocal.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\ref\DhcpSharp.dll
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.pdb
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\obj\Release\net6.0\linux-arm\DhcpSharp.genruntimeconfig.cache
+C:\Users\Max\Desktop\DhcpSharp\DhcpSharp\bin\Release\net6.0\linux-arm\config
