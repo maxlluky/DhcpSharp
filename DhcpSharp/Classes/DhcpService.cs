@@ -22,8 +22,8 @@ class DhcpService
         liveDevice.Open(DeviceModes.Promiscuous, 1000);
 
         Console.WriteLine("Listening on {0} - Using ({1}) Subnet-configurations!\n", liveDevice.Description, subnetList.subnetList.Count);
-        Console.WriteLine("Status\t\tDestination MAC\t\tDHCP Message\t\tTransaction ID\t\tServer Identifier");
-        Console.WriteLine("===========================================================================================================");
+        Console.WriteLine("Status\t\tDestination MAC\t\tMessage\t\tTransaction ID\t\tSubnet (Range)");
+        Console.WriteLine("===================================================================================================================");
 
         builder = new PacketBuilder();
 
@@ -92,13 +92,13 @@ class DhcpService
 
     public void sendDhcpOffer(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
     {
-        Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tOFFER\t\txid: " + pTransactionId);
+        Console.WriteLine("Service send\t{0}\t\tOFFER\t\t{1}\t\t{2} - {3}", pDestinationMacAddress, pTransactionId, pSubnet.rangeStartIp, pSubnet.rangeEndIp);
         liveDevice.SendPacket(builder.buildDhcpOffer(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs, pSubnet));
     }
 
     public void sendDhcpResponse(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
     {
-        Console.WriteLine("Service send:\t\t" + pDestinationMacAddress + "\tACK\t\txid: " + pTransactionId);
+        Console.WriteLine("Service send\t{0}\t\tACK\t\t{1}", pDestinationMacAddress, pTransactionId);
         liveDevice.SendPacket(builder.buildDhcpAck(pSourceMacAddress, pDestinationMacAddress, pTransactionId, pSecs, pSubnet));
     }
 }

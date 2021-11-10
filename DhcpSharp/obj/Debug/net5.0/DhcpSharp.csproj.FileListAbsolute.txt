@@ -1,0 +1,6 @@
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.csproj.AssemblyReference.cache
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.dll.config
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.GeneratedMSBuildEditorConfig.editorconfig
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.AssemblyInfoInputs.cache
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.AssemblyInfo.cs
+E:\DhcpSharp\DhcpSharp\obj\Debug\net5.0\DhcpSharp.csproj.CoreCompileInputs.cache

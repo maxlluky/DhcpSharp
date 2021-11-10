@@ -1,0 +1,7 @@
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.csproj.AssemblyReference.cache
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.dll.config
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.GeneratedMSBuildEditorConfig.editorconfig
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.AssemblyInfoInputs.cache
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.AssemblyInfo.cs
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.csproj.CoreCompileInputs.cache
+E:\DhcpSharp\DhcpSharp\obj\Debug\netcoreapp3.1\DhcpSharp.csproj.SuggestedBindingRedirects.cache

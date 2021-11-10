@@ -1,27 +1,29 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Max\\Desktop\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj": {}
+    "E:\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Max\\Desktop\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj": {
+    "E:\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Max\\Desktop\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj",
+        "projectUniqueName": "E:\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj",
         "projectName": "DhcpSharp",
-        "projectPath": "C:\\Users\\Max\\Desktop\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj",
-        "packagesPath": "C:\\Users\\Max\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Max\\Desktop\\DhcpSharp\\DhcpSharp\\obj\\",
+        "projectPath": "E:\\DhcpSharp\\DhcpSharp\\DhcpSharp.csproj",
+        "packagesPath": "C:\\Users\\mluck\\.nuget\\packages\\",
+        "outputPath": "E:\\DhcpSharp\\DhcpSharp\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Max\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mluck\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

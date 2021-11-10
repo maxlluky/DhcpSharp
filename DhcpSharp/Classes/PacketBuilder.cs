@@ -41,7 +41,7 @@ class PacketBuilder
 
         IPAddress dhcpIp = IPAddress.Parse(pSubnet.dhcpIp);
 
-        //--Build Eth, IP, UDP
+        //--Build Eth, IP, UDP        
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
         IPv4Packet ipv4Packet = new IPv4Packet(dhcpIp, newClientIPAddress);
         UdpPacket udpPacket = new UdpPacket(68, 67);
@@ -65,10 +65,15 @@ class PacketBuilder
             YourAddress = newClientIPAddress,
             ServerAddress = dhcpIp,
             ClientHardwareAddress = pDestinationMacAddress,
-            MagicNumber = 1669485411,
+            MagicNumber = 1669485411,            
         };
 
         dhcpv4Packet.SetOptions(dhcpOptionList);
+
+        //--Checksum
+        Debug.WriteLine("Calculating now Checksum");
+        udpPacket.Checksum = calculateUdpChecksum(dhcpIp, newClientIPAddress, udpPacket);
+        ipv4Packet.Checksum = 65535;
 
         //--Merge
         udpPacket.PayloadData = dhcpv4Packet.Bytes;
@@ -76,6 +81,52 @@ class PacketBuilder
         ethernetPacket.PayloadPacket = ipv4Packet;
 
         return ethernetPacket;
+    }
+
+    private ushort calculateUdpChecksum(IPAddress pSourceIp, IPAddress pDestIp, UdpPacket pUdpPacket)
+    {
+        ushort checksum = 0;
+        byte[] checksumBytes;
+
+        using (MemoryStream memoryStream = new MemoryStream())
+        {
+            using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
+            {
+                Debug.WriteLine("SourceIp: {0}", pSourceIp.ToString());
+                Debug.WriteLine("DestIp: {0}", pDestIp.ToString());
+                Debug.WriteLine("Length: {0}", Convert.ToInt16(pUdpPacket.Length));
+                Debug.WriteLine("S-Port: {0}", pUdpPacket.SourcePort);
+                Debug.WriteLine("D-Port: {0}", pUdpPacket.DestinationPort);
+
+                binaryWriter.Write(pSourceIp.GetAddressBytes()); //--32-bit Source IP
+                binaryWriter.Write(pDestIp.GetAddressBytes()); //--32-bit Dest IP
+                binaryWriter.Write((ushort)17); //--16-bit Zeros and Protocol
+                binaryWriter.Write(Convert.ToInt16(pUdpPacket.Length)); //--16-bit UDP length
+                binaryWriter.Write(pUdpPacket.SourcePort); //--16bit Source Port
+                binaryWriter.Write(pUdpPacket.DestinationPort); //--16bit Dest Port
+                binaryWriter.Write(Convert.ToInt16(pUdpPacket.TotalPacketLength)); //--16-bit UDP length
+                // binaryWriter.Write(pUdpPacket.PayloadData); //--Data
+            }
+
+            checksumBytes = memoryStream.ToArray();
+        }
+
+        Debug.WriteLine("Got ChecksumBytes");
+        /*
+        for (int i=0; i<checksumBytes.Length; i++)
+        {
+            checksum += Convert.ToByte(checksumBytes[i] % 256);
+        }
+        */
+
+        for (int i=0; i<checksumBytes.Length; i++)
+        {
+            byte[] sixteen = { checksumBytes[i], checksumBytes[i++] };
+            checksum += BitConverter.ToUInt16(sixteen, 0);           
+        }            
+
+        Debug.WriteLine("Calculated Checksum: {0}", checksum);
+        return checksum;
     }
 
     public Packet buildDhcpAck(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
@@ -104,7 +155,6 @@ class PacketBuilder
         }
 
         IPAddress dhcpIp = IPAddress.Parse(pSubnet.dhcpIp);
-        IPAddress subnetmask = IPAddress.Parse(pSubnet.netmask);
 
         //--Build Eth, IP, UDP
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
@@ -112,7 +162,7 @@ class PacketBuilder
         UdpPacket udpPacket = new UdpPacket(67, 68);
 
         //--Build DHCP
-        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[548]), null)
+        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[350]), null)
         {
             MessageType = DhcpV4MessageType.Ack,
             Operation = DhcpV4Operation.BootReply,
