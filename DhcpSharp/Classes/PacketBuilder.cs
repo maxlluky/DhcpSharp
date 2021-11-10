@@ -1,10 +1,10 @@
-﻿using DhcpDotNet;
-using PacketDotNet;
+﻿using PacketDotNet;
+using PacketDotNet.DhcpV4;
+using PacketDotNet.Utils;
 using System.Collections;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 
 class PacketBuilder
 {
@@ -39,41 +39,39 @@ class PacketBuilder
             Debug.WriteLine("Listed Client has been generated with IP-Binding: " + newClientIPAddress.ToString() + " and xid: " + pTransactionId + " and MacAddress: " + pDestinationMacAddress.ToString());
         }
 
-        IPAddress ipaddress = IPAddress.Parse(pSubnet.dhcpIp);
+        IPAddress dhcpIp = IPAddress.Parse(pSubnet.dhcpIp);
 
-        DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.DhcpMessageType,
-            optionLength = 0x01,
-            optionValue = new byte[] { 0x02 },
-        };
-
-        DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.ServerIdentifier,
-            optionLength = 0x04,
-            optionValue = ipaddress.GetAddressBytes(),
-        };
-
-        DHCPv4Packet dhcpPacket = new DHCPv4Packet
-        {
-            op = 0x02,
-            htype = 0x01,
-            hlen = 0x06,
-            xid = BitConverter.GetBytes(pTransactionId),
-            secs = BitConverter.GetBytes(pSecs),
-            ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-            yiaddr = newClientIPAddress.GetAddressBytes(),
-            siaddr = ipaddress.GetAddressBytes(),
-            chaddr = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
-            dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
-        };
-
+        //--Build Eth, IP, UDP
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
-        IPv4Packet ipv4Packet = new IPv4Packet(ipaddress, newClientIPAddress);
-        UdpPacket udpPacket = new UdpPacket(67, 68);
+        IPv4Packet ipv4Packet = new IPv4Packet(dhcpIp, newClientIPAddress);
+        UdpPacket udpPacket = new UdpPacket(68, 67);
 
-        udpPacket.PayloadData = dhcpPacket.buildPacket();
+        //--Build DHCP
+        IList<DhcpV4Option> dhcpOptionList = new List<DhcpV4Option>();
+        dhcpOptionList.Add(new MessageTypeOption(DhcpV4MessageType.Offer));
+        dhcpOptionList.Add(new ServerIdOption(dhcpIp));
+        dhcpOptionList.Add(new DomainNameServerOption(IPAddress.Parse(pSubnet.dnsIp)));
+        dhcpOptionList.Add(new DomainNameOption(pSubnet.domainName));
+
+        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[300]), udpPacket)
+        {
+            MessageType = DhcpV4MessageType.Offer,
+            Operation = DhcpV4Operation.BootReply,
+            HardwareType = DhcpV4HardwareType.Ethernet,
+            HardwareLength = 0x06,
+            Xid = pTransactionId,
+            Secs = pSecs,
+            ClientAddress = IPAddress.Parse("0.0.0.0"),
+            YourAddress = newClientIPAddress,
+            ServerAddress = dhcpIp,
+            ClientHardwareAddress = pDestinationMacAddress,
+            MagicNumber = 1669485411,
+        };
+
+        dhcpv4Packet.SetOptions(dhcpOptionList);
+
+        //--Merge
+        udpPacket.PayloadData = dhcpv4Packet.Bytes;
         ipv4Packet.PayloadPacket = udpPacket;
         ethernetPacket.PayloadPacket = ipv4Packet;
 
@@ -105,92 +103,44 @@ class PacketBuilder
             Debug.WriteLine("Server sends a NAK. There is no TransactionId paired to a leased IP-Address! The Server did not received a DISCOVER from the Client");
         }
 
-        IPAddress ipaddress = IPAddress.Parse(pSubnet.dhcpIp);
+        IPAddress dhcpIp = IPAddress.Parse(pSubnet.dhcpIp);
         IPAddress subnetmask = IPAddress.Parse(pSubnet.netmask);
 
-        DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.DhcpMessageType,
-            optionLength = 0x01,
-            optionValue = new byte[] { 0x05 },
-        };
-
-        DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.ServerIdentifier,
-            optionLength = 0x04,
-            optionValue = ipaddress.GetAddressBytes(),
-        };
-
-        DHCPv4Option ipAddressLeaseTimeOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.IpAddressLeaseTime,
-            optionLength = 0x04,
-            optionValue = new byte[] { 0x00, 0x0d, 0x2f, 0x00 },
-        };
-
-        DHCPv4Option renewalTimeValueOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.RenewalTimeValue,
-            optionLength = 0x04,
-            optionValue = new byte[] { 0x00, 0x06, 0x97, 0x80 },
-        };
-
-        DHCPv4Option rebindTimeValueOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.RebindingTimeValue,
-            optionLength = 0x04,
-            optionValue = new byte[] { 0x00, 0x0b, 0x89, 0x20 },
-        };
-
-
-        DHCPv4Option subnetMaskOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.Subnetmask,
-            optionLength = 0x04,
-            optionValue = subnetmask.GetAddressBytes(),
-        };
-
-        DHCPv4Option routerOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.Router,
-            optionLength = 0x04,
-            optionValue = IPAddress.Parse(pSubnet.gatewayIp).GetAddressBytes(),
-        };
-
-        DHCPv4Option domainNameServerOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.DomainNameServer,
-            optionLength = 0x04,
-            optionValue = IPAddress.Parse(pSubnet.dnsIp).GetAddressBytes(),
-        };
-
-        DHCPv4Option domainNameOption = new DHCPv4Option
-        {
-            optionId = DHCPv4OptionIds.DomainName,
-            optionLength = (byte)pSubnet.domainName.Length,
-            optionValue = Encoding.ASCII.GetBytes(pSubnet.domainName),
-        };
-
-        DHCPv4Packet dhcpPacket = new DHCPv4Packet
-        {
-            op = 0x02,
-            htype = 0x01,
-            hlen = 0x06,
-            xid = BitConverter.GetBytes(pTransactionId),
-            secs = BitConverter.GetBytes(pSecs),
-            ciaddr = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-            yiaddr = newClientIPAddress.GetAddressBytes(),
-            siaddr = ipaddress.GetAddressBytes(),
-            chaddr = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
-            dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).Concat(ipAddressLeaseTimeOption.buildDhcpOption()).Concat(renewalTimeValueOption.buildDhcpOption()).Concat(rebindTimeValueOption.buildDhcpOption()).Concat(subnetMaskOption.buildDhcpOption()).Concat(routerOption.buildDhcpOption()).Concat(domainNameServerOption.buildDhcpOption()).Concat(domainNameOption.buildDhcpOption()).ToArray(),
-        };
-
+        //--Build Eth, IP, UDP
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
-        IPv4Packet ipv4Packet = new IPv4Packet(ipaddress, newClientIPAddress);
+        IPv4Packet ipv4Packet = new IPv4Packet(dhcpIp, newClientIPAddress);
         UdpPacket udpPacket = new UdpPacket(67, 68);
 
-        udpPacket.PayloadData = dhcpPacket.buildPacket();
+        //--Build DHCP
+        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[548]), null)
+        {
+            MessageType = DhcpV4MessageType.Ack,
+            Operation = DhcpV4Operation.BootReply,
+            HardwareType = DhcpV4HardwareType.Ethernet,
+            HardwareLength = 0x06,
+            Xid = pTransactionId,
+            Secs = pSecs,
+            ClientAddress = IPAddress.Parse("0.0.0.0"),
+            YourAddress = newClientIPAddress,
+            ServerAddress = dhcpIp,
+            ClientHardwareAddress = pDestinationMacAddress,
+            MagicNumber = 1669485411,
+        };
+
+        IList<DhcpV4Option> dhcpOptionList = new List<DhcpV4Option>();
+        dhcpOptionList.Add(new MessageTypeOption(DhcpV4MessageType.Ack));
+        dhcpOptionList.Add(new ServerIdOption(dhcpIp));
+        dhcpOptionList.Add(new AddressTimeOption(TimeSpan.FromSeconds(864000)));
+        dhcpOptionList.Add(new RenewalTimeOption(TimeSpan.FromSeconds(432000)));
+        dhcpOptionList.Add(new RebindingTimeOption(TimeSpan.FromSeconds(756000)));
+        dhcpOptionList.Add(new SubnetMaskOption(IPAddress.Parse(pSubnet.netmask)));
+        dhcpOptionList.Add(new RouterOption(IPAddress.Parse(pSubnet.gatewayIp)));
+        dhcpOptionList.Add(new DomainNameServerOption(IPAddress.Parse(pSubnet.dnsIp)));
+        dhcpOptionList.Add(new DomainNameOption(pSubnet.domainName));
+        dhcpv4Packet.SetOptions(dhcpOptionList);
+
+        //--Merge
+        udpPacket.PayloadPacket = dhcpv4Packet;
         ipv4Packet.PayloadPacket = udpPacket;
         ethernetPacket.PayloadPacket = ipv4Packet;
 

@@ -19,15 +19,6 @@
           "build/Costura.Fody.targets": {}
         }
       },
-      "DhcpDotNet/2.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        }
-      },
       "Fody/6.5.5": {
         "type": "package",
         "build": {
@@ -1315,19 +1306,6 @@
         "netclassicweaver/Costura.Fody.xcf",
         "netstandardweaver/Costura.Fody.dll",
         "netstandardweaver/Costura.Fody.xcf"
-      ]
-    },
-    "DhcpDotNet/2.0.5": {
-      "sha512": "jue4kyoRikIeCK4XDM9lnkSihinwRkggvL0rEb7eh/80i+i8DXGn5oi56t/rw/uqASzgukf/y6QxegCCRaRwTg==",
-      "type": "package",
-      "path": "dhcpdotnet/2.0.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "dhcpdotnet.2.0.5.nupkg.sha512",
-        "dhcpdotnet.nuspec",
-        "lib/netstandard2.0/DhcpDotNet.dll",
-        "logo.png"
       ]
     },
     "Fody/6.5.5": {
@@ -4787,7 +4765,6 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "Costura.Fody >= 5.7.0",
-      "DhcpDotNet >= 2.0.5",
       "Newtonsoft.Json >= 13.0.1",
       "SharpPcap >= 6.1.0"
     ]
@@ -4836,10 +4813,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[5.7.0, )"
-          },
-          "DhcpDotNet": {
-            "target": "Package",
-            "version": "[2.0.5, )"
           },
           "Newtonsoft.Json": {
             "target": "Package",
