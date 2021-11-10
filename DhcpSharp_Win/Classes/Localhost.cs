@@ -3,7 +3,7 @@
 class Localhost
 {
     private static CaptureDeviceList deviceList = CaptureDeviceList.Instance;
-    private static ILiveDevice liveDevice = null;
+    private static ILiveDevice liveDevice;
 
     public CaptureDeviceList getUseableInterfaces()
     {

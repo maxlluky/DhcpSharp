@@ -1,6 +1,7 @@
 ﻿using PacketDotNet;
 using PacketDotNet.DhcpV4;
 using SharpPcap;
+using System;
 using System.Net.NetworkInformation;
 
 class Service
@@ -21,7 +22,7 @@ class Service
         liveDevice = localhost.getActiveInterface();
         liveDevice.Open(DeviceModes.Promiscuous, 1000);
 
-        Console.WriteLine("Listening on {0} - Using ({1}) Subnet-configurations!\n", liveDevice.Description, subnetList.list.Count);
+        Console.WriteLine("Listening on {0} - Using ({1}) Subnet-configurations!\n",liveDevice.Description, subnetList.list.Count);
         Console.WriteLine("Status\t\tDestination MAC\t\tDHCP Message\tTransaction ID\t\tServer Identifier");
         Console.WriteLine("===========================================================================================================");
 

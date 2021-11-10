@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "9a7016f6-6e58-4dee-84a1-8f050aede93d": {
+      "ProjectGuid": "9a7016f6-6e58-4dee-84a1-8f050aede93d",
+      "DisplayName": "DhcpSharp_Win",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Sonstige Dateien",
+      "ColorIndex": -1
+    },
+    "da06c305-2cab-4637-b68b-41a94b3e95ef": {
+      "ProjectGuid": "da06c305-2cab-4637-b68b-41a94b3e95ef",
+      "DisplayName": "DhcpSharp",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}

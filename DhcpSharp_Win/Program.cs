@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SharpPcap;
+using System;
+using System.IO;
 using System.Reflection;
 
 namespace DhcpSharp
@@ -59,7 +61,7 @@ namespace DhcpSharp
             {
                 Console.WriteLine("Error! Canot find the config-file. Please create config-file!");
                 Environment.Exit(0);
-            }
+            }                
 
             using (StreamReader streamReader = new StreamReader("config"))
             {

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 public class Subnet
 {
@@ -30,13 +31,13 @@ public class Subnet
     /// <summary>
     /// DHCP-Range of the Subnet
     /// </summary>
-    public string? rangeStartIp;
-    public string? rangeEndIp;
+    public string rangeStartIp;
+    public string rangeEndIp;
 
     /// <summary>
     /// Networkmask of the Subnet 
     /// </summary>
-    public string? netmask;
+    public string netmask;
 
     private List<IPAddress> freeAddressList = new List<IPAddress>();
     private List<IPAddress> leasedAddressList = new List<IPAddress>();
