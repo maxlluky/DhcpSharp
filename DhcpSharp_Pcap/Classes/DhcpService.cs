@@ -7,7 +7,7 @@ class DhcpService
 {
     private Interface localhost;
     private Config subnetList;
-    private NetPacket builder;
+    private PacketBldr builder;
     private ILiveDevice liveDevice;
 
     public DhcpService(Interface pLocalhost, Config pSubnetList)
@@ -25,7 +25,7 @@ class DhcpService
         Console.WriteLine("Status\t\tDestination MAC\t\tMessage\t\tTransaction ID\t\tSubnet (Range)");
         Console.WriteLine("===================================================================================================================");
 
-        builder = new NetPacket();
+        builder = new PacketBldr();
 
         liveDevice.OnPacketArrival +=
            new PacketArrivalEventHandler(device_OnPacketArrival);

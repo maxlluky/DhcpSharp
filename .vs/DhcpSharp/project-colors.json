@@ -15,7 +15,17 @@
       "ProjectGuid": "da06c305-2cab-4637-b68b-41a94b3e95ef",
       "DisplayName": "DhcpSharp",
       "ColorIndex": 1
+    },
+    "930c69cd-b05f-4de9-b5c0-12c25cefcc6a": {
+      "ProjectGuid": "930c69cd-b05f-4de9-b5c0-12c25cefcc6a",
+      "DisplayName": "DhcpSharp_Pcap",
+      "ColorIndex": 2
+    },
+    "ec8fbdce-a920-4232-aa4e-7bb73e182d24": {
+      "ProjectGuid": "ec8fbdce-a920-4232-aa4e-7bb73e182d24",
+      "DisplayName": "DhcpSharp_Win",
+      "ColorIndex": 3
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 4
 }

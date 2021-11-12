@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 
-class PacketBuilder
+class NetPacket
 {
     private List<Client> clientList = new List<Client>();
 
@@ -65,7 +65,7 @@ class PacketBuilder
             YourAddress = newClientIPAddress,
             ServerAddress = dhcpIp,
             ClientHardwareAddress = pDestinationMacAddress,
-            MagicNumber = 1669485411,            
+            MagicNumber = 1669485411,
         };
 
         dhcpv4Packet.SetOptions(dhcpOptionList);
@@ -77,7 +77,7 @@ class PacketBuilder
 
         return ethernetPacket;
     }
-    
+
     public Packet buildDhcpAck(PhysicalAddress pSourceMacAddress, PhysicalAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)
     {
         IPAddress newClientIPAddress = IPAddress.Parse("0.0.0.0");
@@ -139,7 +139,7 @@ class PacketBuilder
         dhcpv4Packet.SetOptions(dhcpOptionList);
 
         //--Merge
-        udpPacket.PayloadPacket = dhcpv4Packet;
+        udpPacket.PayloadData = dhcpv4Packet.Bytes;
         ipv4Packet.PayloadPacket = udpPacket;
         ethernetPacket.PayloadPacket = ipv4Packet;
 

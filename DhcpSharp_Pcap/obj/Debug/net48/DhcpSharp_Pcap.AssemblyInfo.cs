@@ -11,13 +11,13 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("DhcpSharp")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("DhcpSharp_Pcap")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.1.2.1")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyProductAttribute("DhcpSharp")]
-[assembly: System.Reflection.AssemblyTitleAttribute("DhcpSharp")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.1.2.1")]
+[assembly: System.Reflection.AssemblyProductAttribute("DhcpSharp_Pcap")]
+[assembly: System.Reflection.AssemblyTitleAttribute("DhcpSharp_Pcap")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Von der MSBuild WriteCodeFragment-Klasse generiert.
 
