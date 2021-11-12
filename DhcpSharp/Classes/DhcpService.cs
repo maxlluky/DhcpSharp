@@ -1,6 +1,7 @@
 ﻿using PacketDotNet;
 using PacketDotNet.DhcpV4;
 using SharpPcap;
+using System.Diagnostics;
 using System.Net.NetworkInformation;
 
 class DhcpService
@@ -48,8 +49,9 @@ class DhcpService
 
             if (udpPacket != null)
             {
-                if (udpPacket.SourcePort == 68 & udpPacket.DestinationPort == 67)
+                if (udpPacket.SourcePort == 68 & udpPacket.DestinationPort == 67 | udpPacket.SourcePort == 67 & udpPacket.DestinationPort == 67)
                 {
+                    Debug.WriteLine("DHCP-Packet discovered from: {0}", ipv4Packet.SourceAddress.ToString());
                     foreach (DhcpV4Option dhcpv4Option in dhcpv4Packet.GetOptions())
                     {
                         if (dhcpv4Option.OptionType == DhcpV4OptionType.DHCPMsgType)

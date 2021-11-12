@@ -1,6 +1,0 @@
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.csproj.AssemblyReference.cache
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.csproj.SuggestedBindingRedirects.cache
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.GeneratedMSBuildEditorConfig.editorconfig
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.AssemblyInfoInputs.cache
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.AssemblyInfo.cs
-E:\DhcpSharp\DhcpSharp_Pcap\obj\Debug\net48\DhcpSharp_Pcap.csproj.CoreCompileInputs.cache

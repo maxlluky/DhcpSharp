@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 class DhcpService
 {
@@ -47,7 +48,7 @@ class DhcpService
             UdpDatagram udpPacket = ipv4Packet.Udp;
             Datagram datagram = udpPacket.Payload;
 
-            if (udpPacket.SourcePort.Equals(68) & udpPacket.DestinationPort.Equals(67))
+            if (udpPacket.SourcePort == 68 & udpPacket.DestinationPort == 67 | udpPacket.SourcePort == 67 & udpPacket.DestinationPort == 67)
             {
                 DHCPv4Packet dhcpv4Packet = new DHCPv4Packet();
                 if (dhcpv4Packet.parsePacket(datagram.ToArray()))
@@ -61,8 +62,6 @@ class DhcpService
                             {
                                 //--Packet is a Discover
                                 case 0x01:
-                                    Console.WriteLine("Service received:\t" + packet.Ethernet.Destination + "\tDISCOVER\txid: " + BitConverter.ToString(dhcpv4Packet.xid));
-
                                     foreach (Subnet subnet in subnet_conf.subnetList)
                                     {
                                         if (ipv4Packet.Source.ToString() == subnet.listenIp.ToString())
@@ -71,7 +70,6 @@ class DhcpService
                                             sendDhcpOffer(local_interface.getMacAddress(), convertMacAddress(dhcpv4Packet.chaddr), BitConverter.ToUInt32(dhcpv4Packet.xid, 0), BitConverter.ToUInt16(dhcpv4Packet.secs, 0), subnet);
                                         }
                                     }
-
 
                                     break;
                                 //--Packet is an Request
@@ -97,13 +95,18 @@ class DhcpService
                 }
             }
         }
-        catch (Exception) { }
+        catch (Exception eX)
+        {
+            Debug.WriteLine(eX.Message);
+        }
     }
 
     private MacAddress convertMacAddress(byte[] pMacBytes)
     {
-
-        return new MacAddress();
+        PhysicalAddress addr = new PhysicalAddress(pMacBytes);
+        var addrString = string.Join(":", new PhysicalAddress(pMacBytes).GetAddressBytes().Select(b => b.ToString("X2")));
+        Debug.WriteLine("Addresse (string): " + addrString);
+        return new MacAddress(addrString);
     }
 
     public void sendDhcpOffer(MacAddress pSourceMacAddress, MacAddress pDestinationMacAddress, uint pTransactionId, ushort pSecs, Subnet pSubnet)

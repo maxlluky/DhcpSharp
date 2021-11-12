@@ -46,6 +46,9 @@ class NetPacket
         }
 
         IPAddress dhcpIp = IPAddress.Parse(pSubnet.dhcpIp);
+        IPAddress dnsIp = IPAddress.Parse(pSubnet.dnsIp);
+        IPAddress gateway = IPAddress.Parse(pSubnet.gatewayIp);
+        IPAddress subnetmask = IPAddress.Parse(pSubnet.netmask);
 
         DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
         {
@@ -53,12 +56,61 @@ class NetPacket
             optionLength = 0x01,
             optionValue = new byte[] { 0x02 },
         };
-
         DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
         {
             optionId = DHCPv4OptionIds.ServerIdentifier,
             optionLength = 0x04,
             optionValue = dhcpIp.GetAddressBytes(),
+        };
+
+        DHCPv4Option ipAddressLeaseTimeOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.IpAddressLeaseTime,
+            optionLength = 0x04,
+            optionValue = new byte[] { 0x00, 0x0d, 0x2f, 0x00 },
+        };
+
+        DHCPv4Option renewalTimeValueOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.RenewalTimeValue,
+            optionLength = 0x04,
+            optionValue = new byte[] { 0x00, 0x06, 0x97, 0x80 },
+        };
+
+        DHCPv4Option rebindTimeValueOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.RebindingTimeValue,
+            optionLength = 0x04,
+            optionValue = new byte[] { 0x00, 0x0b, 0x89, 0x20 },
+        };
+
+
+        DHCPv4Option subnetMaskOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.Subnetmask,
+            optionLength = 0x04,
+            optionValue = subnetmask.GetAddressBytes(),
+        };
+
+        DHCPv4Option routerOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.Router,
+            optionLength = 0x04,
+            optionValue = gateway.GetAddressBytes(),
+        };
+
+        DHCPv4Option domainNameServerOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.DomainNameServer,
+            optionLength = 0x04,
+            optionValue = dnsIp.GetAddressBytes(),
+        };
+
+        DHCPv4Option domainNameOption = new DHCPv4Option
+        {
+            optionId = DHCPv4OptionIds.DomainName,
+            optionLength = (byte)pSubnet.domainName.Length,
+            optionValue = Encoding.ASCII.GetBytes(pSubnet.domainName),
         };
 
         DHCPv4Packet dhcpPacket = new DHCPv4Packet
@@ -72,7 +124,7 @@ class NetPacket
             yiaddr = newClientIPAddress.GetAddressBytes(),
             siaddr = dhcpIp.GetAddressBytes(),
             chaddr = PhysicalAddress.Parse(pDestinationMacAddress.ToString().Replace(":", "-")).GetAddressBytes(),
-            dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
+            dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).Concat(ipAddressLeaseTimeOption.buildDhcpOption()).Concat(renewalTimeValueOption.buildDhcpOption()).Concat(rebindTimeValueOption.buildDhcpOption()).Concat(subnetMaskOption.buildDhcpOption()).Concat(routerOption.buildDhcpOption()).Concat(domainNameServerOption.buildDhcpOption()).Concat(domainNameOption.buildDhcpOption()).ToArray(),
         };
 
         EthernetLayer ethernetLayer = new EthernetLayer

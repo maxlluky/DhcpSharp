@@ -44,16 +44,21 @@ class NetPacket
         //--Build Eth, IP, UDP        
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
         IPv4Packet ipv4Packet = new IPv4Packet(dhcpIp, newClientIPAddress);
-        UdpPacket udpPacket = new UdpPacket(68, 67);
+        UdpPacket udpPacket = new UdpPacket(67, 68);
 
         //--Build DHCP
         IList<DhcpV4Option> dhcpOptionList = new List<DhcpV4Option>();
         dhcpOptionList.Add(new MessageTypeOption(DhcpV4MessageType.Offer));
         dhcpOptionList.Add(new ServerIdOption(dhcpIp));
+        dhcpOptionList.Add(new AddressTimeOption(TimeSpan.FromSeconds(864000)));
+        dhcpOptionList.Add(new RenewalTimeOption(TimeSpan.FromSeconds(432000)));
+        dhcpOptionList.Add(new RebindingTimeOption(TimeSpan.FromSeconds(756000)));
+        dhcpOptionList.Add(new SubnetMaskOption(IPAddress.Parse(pSubnet.netmask)));
+        dhcpOptionList.Add(new RouterOption(IPAddress.Parse(pSubnet.gatewayIp)));
         dhcpOptionList.Add(new DomainNameServerOption(IPAddress.Parse(pSubnet.dnsIp)));
         dhcpOptionList.Add(new DomainNameOption(pSubnet.domainName));
 
-        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[300]), udpPacket)
+        DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[512]), udpPacket)
         {
             MessageType = DhcpV4MessageType.Offer,
             Operation = DhcpV4Operation.BootReply,
@@ -69,6 +74,10 @@ class NetPacket
         };
 
         dhcpv4Packet.SetOptions(dhcpOptionList);
+
+        //--Checksum & TTL
+        ipv4Packet.Checksum = 52286;
+        ipv4Packet.TimeToLive = 128;
 
         //--Merge
         udpPacket.PayloadData = dhcpv4Packet.Bytes;
@@ -108,7 +117,7 @@ class NetPacket
         //--Build Eth, IP, UDP
         EthernetPacket ethernetPacket = new EthernetPacket(pSourceMacAddress, pDestinationMacAddress, EthernetType.IPv4);
         IPv4Packet ipv4Packet = new IPv4Packet(dhcpIp, newClientIPAddress);
-        UdpPacket udpPacket = new UdpPacket(67, 68);
+        UdpPacket udpPacket = new UdpPacket(67, 67);
 
         //--Build DHCP
         DhcpV4Packet dhcpv4Packet = new DhcpV4Packet(new ByteArraySegment(new byte[350]), udpPacket)
