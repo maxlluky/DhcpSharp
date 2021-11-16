@@ -154,4 +154,17 @@ class NetPacket
 
         return ethernetPacket;
     }
+    
+    public byte[] calculateChecksum(byte[] buffer)
+    {
+        int sum = 0;
+        foreach ( var b in buffer)
+            sum += b;
+        
+        sum %= 0x100;
+        byte [] ch = new byte[2];
+        ch[0] = (byte) ((sum >> 4) + 0x30);
+        ch[1] = (byte) ((sum & 0xF) + 0x30);
+        return ch;
+    }
 }
